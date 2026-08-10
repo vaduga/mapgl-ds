@@ -3,8 +3,8 @@ import {
   compare_service_link_cost as wasmCompareServiceLinkCost,
   extract_service_graph as wasmExtractServiceGraph,
   extract_trace_branches as wasmExtractTraceBranches,
-} from '../agent-core/pkg/agent_core';
-import wasmDataUrl from '../agent-core/pkg/agent_core_bg.wasm';
+} from '../wasm-core/pkg/agent_core';
+import wasmDataUrl from '../wasm-core/pkg/agent_core_bg.wasm';
 
 let initialized = false;
 

@@ -4,10 +4,10 @@ package-lock.json
 
 # Rust
 /target/
-agent-core/target/
+wasm-core/target/
 
 # WASM build output
-agent-core/pkg/
+wasm-core/pkg/
 
 # Build output
 /dist/

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["agent-core", "otel-mock"]
+members = ["wasm-core", "otel-mock"]
 
 [workspace.lints.clippy]
 all = { level = "deny", priority = -1 }

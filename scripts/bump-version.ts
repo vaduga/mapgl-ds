@@ -85,7 +85,7 @@ updateJson(path.join(root, 'plugin.json'), (plugin) => {
   info.updated = today;
 });
 
-updateToml(path.join(root, 'agent-core/Cargo.toml'), version);
+updateToml(path.join(root, 'wasm-core/Cargo.toml'), version);
 updateToml(path.join(root, 'otel-mock/Cargo.toml'), version);
 
 console.log(`\nDone. Run 'bun run build' to include the new version in dist.`);

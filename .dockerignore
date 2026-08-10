@@ -3,7 +3,7 @@
 dist
 node_modules
 target
-agent-core/target
-agent-core/pkg
+wasm-core/target
+wasm-core/pkg
 coverage
 *.log

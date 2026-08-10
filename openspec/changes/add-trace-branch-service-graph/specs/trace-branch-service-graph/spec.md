@@ -70,7 +70,7 @@ The datasource SHALL support a `linkCostComparison` result mode that returns the
 - **THEN** the datasource SHALL return a schema-valid empty DataFrame
 
 ### Requirement: Trace branch processing location
-Trace branch extraction and link-cost reduction SHALL run in `agent-core` WASM.
+Trace branch extraction and link-cost reduction SHALL run in `wasm-core` WASM.
 
 #### Scenario: WASM extraction succeeds
 - **WHEN** normalized traces are passed to the WASM trace branch analyzer

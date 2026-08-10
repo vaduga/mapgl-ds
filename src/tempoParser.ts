@@ -507,7 +507,7 @@ export function aggregateServiceGraphEdges(
     });
 }
 
-/** TypeScript fallback that mirrors agent-core `extract_service_graph`. */
+/** TypeScript fallback that mirrors the WASM core `extract_service_graph`. */
 export function extractServiceGraphFallback(traces: readonly ParsedTrace[]): ServiceGraph {
   const services = new Set<string>();
   const edgeKeys = new Set<string>();

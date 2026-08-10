@@ -11,7 +11,7 @@ flowchart LR
   Proxy --> Tempo[Tempo API]
   Tempo --> Parser[Tempo payload parser]
   Parser --> SpanFrame[Span DataFrame]
-  Parser --> Wasm[agent-core WASM]
+  Parser --> Wasm[wasm-core WASM]
   Wasm --> GraphFrame[Service graph DataFrame]
   Parser --> Fallback[TypeScript graph fallback]
   Fallback --> GraphFrame
@@ -34,9 +34,9 @@ Tempo requests are routed through Grafana's proxy using the datasource UID. The 
 - `src/wasmBridge.ts`: initializes the Rust WASM bundle and exposes graph extraction.
 - `src/components/QueryEditor.tsx`: Grafana query editor for trace ID, TraceQL, limit, and result mode.
 - `src/types.ts`: datasource query and JSON configuration types.
-- `agent-core/src/service_graph.rs`: Rust WASM service graph extraction.
-- `agent-core/src/trace_branch_analysis.rs`: indexed trace-branch extraction and directed link-cost reduction.
-- `agent-core/src/trace_analyzer.rs`: trace analysis types and logic kept for trace-oriented analytics.
+- `wasm-core/src/service_graph.rs`: Rust WASM service graph extraction.
+- `wasm-core/src/trace_branch_analysis.rs`: indexed trace-branch extraction and directed link-cost reduction.
+- `wasm-core/src/trace_analyzer.rs`: trace analysis types and logic kept for trace-oriented analytics.
 - `otel-mock/`: local OTLP trace generator used by Docker Compose.
 
 ## Query Modes
@@ -72,7 +72,7 @@ Edges are derived from parent-child span relationships where parent and child be
 
 ## WASM Boundary
 
-The frontend passes normalized traces to `agent-core` as a JSON string. The WASM function returns service graph JSON:
+The frontend passes normalized traces to `wasm-core` as a JSON string. The WASM function returns service graph JSON:
 
 ```json
 {

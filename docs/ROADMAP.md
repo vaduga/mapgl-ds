@@ -7,7 +7,7 @@
 - Removed the old Grafana panel implementation from the active source tree.
 - Reduced the Docker stack to Grafana, Tempo, and OTLP trace generation.
 - Added persistent Grafana state under `docker_data/grafana_data`.
-- Kept `agent-core` focused on trace and service graph analysis.
+- Kept `wasm-core` focused on trace and service graph analysis.
 - Removed metric, log, and root-cause modules from the active implementation.
 - Added span and service graph DataFrame query modes.
 - Added trace-branch-backed service graph output with service nodes and aggregated directed inter-service edge metrics.

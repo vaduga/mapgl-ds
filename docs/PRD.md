@@ -20,7 +20,7 @@ Tempo stores the trace data needed for service topology analysis, but Grafana us
 - Return normalized span rows for trace-level debugging.
 - Return service graph rows for graph visualization and dataframe debugging.
 - Keep the plugin frontend-only and deployable as a standard Grafana datasource plugin.
-- Reuse `agent-core` WASM for graph analytics when available.
+- Reuse `wasm-core` WASM for graph analytics when available.
 
 ## User Stories
 

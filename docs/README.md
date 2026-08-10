@@ -18,7 +18,7 @@ Kept in scope:
 - Tempo trace search and trace fetch.
 - Span-level DataFrames for table/debug workflows.
 - Service graph DataFrames derived from parent-child span relationships.
-- Rust WASM analysis code in `agent-core` with frontend fallback behavior.
+- Rust WASM analysis code in `wasm-core` with frontend fallback behavior.
 - Local Docker stack with Grafana, Tempo, and the OTLP trace mock.
 
 Out of scope:
