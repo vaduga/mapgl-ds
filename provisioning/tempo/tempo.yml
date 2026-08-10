@@ -14,8 +14,10 @@ ingester:
 
 compactor:
   compaction:
-    block_retention: 5m
-    compacted_block_retention: 2m
+    # Keep enough history for the provisioned six-hour development dashboard.
+    block_retention: 24h
+    # Must exceed the blocklist polling staleness window (2 * 1m).
+    compacted_block_retention: 15m
 
 storage:
   trace:
@@ -24,7 +26,7 @@ storage:
       path: /var/lib/tempo/wal
     local:
       path: /var/lib/tempo/blocks
-    blocklist_poll: 5m
+    blocklist_poll: 1m
     pool:
       max_workers: 2
       queue_depth: 64

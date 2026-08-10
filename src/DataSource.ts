@@ -226,7 +226,7 @@ export class DataSource extends DataSourceApi<TempoDataFrameQuery, TempoDataFram
     const edges = aggregateServiceGraphEdges(graph.links);
     const frame = new MutableDataFrame({
       refId,
-      name: `${refId} Tempo service graph`,
+      name: `${refId}. SDG`,
       meta: {},
       fields: [
         { name: 'type', type: FieldType.string },
@@ -291,7 +291,7 @@ export class DataSource extends DataSourceApi<TempoDataFrameQuery, TempoDataFram
     const graph = this.extractTraceBranches(traces);
     const frame = new MutableDataFrame({
       refId,
-      name: `${refId} Tempo trace branches`,
+      name: `${refId}. Traces`,
       meta: {},
       fields: [
         { name: 'type', type: FieldType.string },

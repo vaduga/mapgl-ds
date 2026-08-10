@@ -543,7 +543,7 @@
         }
       ],
       "title": "Traces+Service dependency graph",
-      "type": "vaduga-mapglpro-panel"
+      "type": "vaduga-mapgl-panel"
     }
   ],
   "preload": false,
@@ -578,7 +578,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Mapgl Service graph",
+  "title": "Mapgl service graph",
   "uid": "33f9075c-015b-4498-a6f4-c02a469b2093",
   "version": 7,
   "weekStart": ""
