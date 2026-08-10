@@ -1,4 +1,3 @@
-// @managed by create-grafana-plugin — do not edit
 //! Synthetic multi-service call graph for generating realistic distributed traces
 //! with error simulation, latency outliers, and rich OTel semantic attributes.
 

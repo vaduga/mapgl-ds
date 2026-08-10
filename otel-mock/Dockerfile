@@ -1,4 +1,3 @@
-# @managed by create-grafana-plugin — do not edit
 FROM rust:1-bookworm AS builder
 WORKDIR /app
 COPY otel-mock/Cargo.toml ./

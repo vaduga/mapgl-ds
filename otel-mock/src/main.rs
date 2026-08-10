@@ -1,4 +1,3 @@
-// @managed by create-grafana-plugin — do not edit
 //! Mock telemetry data generator for the Tempo datasource.
 //!
 //! Generates high-fidelity synthetic data:

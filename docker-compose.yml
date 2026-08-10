@@ -1,4 +1,3 @@
-# @managed by create-grafana-plugin — do not edit
 name: vaduga-mapgl-ds
 
 services:
