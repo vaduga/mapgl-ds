@@ -542,14 +542,14 @@
           "refId": "Services"
         }
       ],
-      "title": "Traces+Service dependency graph",
+      "title": "Traces on Service dependency graph",
       "type": "vaduga-mapgl-panel"
     }
   ],
   "preload": false,
   "refresh": "",
   "schemaVersion": 42,
-  "tags": [],
+  "tags": ["traces"],
   "templating": {
     "list": [
       {
@@ -578,7 +578,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Mapgl service graph",
+  "title": "Mapgl Service graph",
   "uid": "33f9075c-015b-4498-a6f4-c02a469b2093",
   "version": 7,
   "weekStart": ""
