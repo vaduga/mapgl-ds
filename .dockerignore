@@ -1,0 +1,9 @@
+.git
+.cursor
+dist
+node_modules
+target
+agent-core/target
+agent-core/pkg
+coverage
+*.log

@@ -1,0 +1,20 @@
+schema: spec-driven
+
+context: |
+  Project: vaduga-mapgl-datasource
+  Product type: Grafana frontend datasource plugin
+  Runtime: React 18 + TypeScript datasource frontend, Rust WASM analysis engine, Grafana datasource proxy, Tempo
+  Package manager: bun
+  Build: Rspack AMD bundle plus wasm-pack output
+  Local stack: Grafana, Tempo, OTLP trace mock
+  Scope: traces, Tempo querying, span DataFrames, service graph DataFrames, trace branch service graph analytics
+  Non-goals: Prometheus metrics, Loki logs, LLM incident reports, old Grafana panel UI
+
+rules:
+  proposal:
+    - Keep proposals focused on trace and service graph datasource behavior.
+    - Include explicit non-goals when a change could be confused with removed metrics/log/LLM functionality.
+  specs:
+    - Requirements must describe observable datasource behavior or analysis output contracts.
+    - DataFrame field names must be explicit and stable.
+    - Query modes must state whether they return spans, graph rows, trace branches, or comparison traces.

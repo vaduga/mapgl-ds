@@ -1,0 +1,7 @@
+Read and follow all rules defined in AGENTS.md at the project root.
+That file is the single source of truth for coding standards.
+
+Additional Windsurf-specific notes:
+- Use `bun run verify` before any commit
+- Refer to docs/DESIGN.md for architecture
+- Refer to docs/PRD.md for product requirements

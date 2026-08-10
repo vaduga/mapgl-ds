@@ -1,0 +1,19 @@
+# @managed by create-grafana-plugin — do not edit
+apiVersion: 1
+prune: true
+datasources:
+  - name: Mapgl Tempo DataFrames
+    type: vaduga-mapgl-datasource
+    uid: mapgl-tempo-dataframes
+    access: proxy
+    url: http://tempo:3200
+    isDefault: true
+    editable: true
+    jsonData:
+      defaultLimit: 20
+
+  - name: TestData
+    type: testdata
+    access: proxy
+    isDefault: false
+    uid: 'f8b9d80c-0d2f-46c6-8b94-d996a6cfc327'

@@ -1,0 +1,43 @@
+# Node.js
+node_modules/
+package-lock.json
+
+# Rust
+/target/
+agent-core/target/
+
+# WASM build output
+agent-core/pkg/
+
+# Build output
+/dist/
+/dist_pro/
+
+# Local Docker persistence
+/docker_data/
+
+# IDE
+.idea/
+.vscode/
+.cursor/
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage
+coverage/
+
+# ESLint
+.eslintcache
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+verify-out.txt

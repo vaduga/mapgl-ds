@@ -1,0 +1,35 @@
+server:
+  http_listen_port: 3200
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+          endpoint: "0.0.0.0:4317"
+
+ingester:
+  max_block_duration: 2m
+  max_block_bytes: 2097152
+
+compactor:
+  compaction:
+    block_retention: 5m
+    compacted_block_retention: 2m
+
+storage:
+  trace:
+    backend: local
+    wal:
+      path: /var/lib/tempo/wal
+    local:
+      path: /var/lib/tempo/blocks
+    blocklist_poll: 5m
+    pool:
+      max_workers: 2
+      queue_depth: 64
+
+overrides:
+  defaults:
+    global:
+      max_bytes_per_trace: 500000

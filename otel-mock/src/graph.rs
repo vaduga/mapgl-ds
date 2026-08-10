@@ -1,0 +1,382 @@
+// @managed by create-grafana-plugin — do not edit
+//! Synthetic multi-service call graph for generating realistic distributed traces
+//! with error simulation, latency outliers, and rich OTel semantic attributes.
+
+use std::ops::Range;
+
+use rand::seq::SliceRandom;
+use rand::Rng;
+
+const HOP_SLEEP_CAP_MS: u64 = 2500;
+/// ~5% of hops produce a latency outlier (3–10x normal range).
+const LATENCY_OUTLIER_PROBABILITY: f64 = 0.05;
+
+/// Fixed realistic call chain templates representing common request flows.
+const CALL_CHAINS: &[&[&str]] = &[
+    &["api-gateway", "auth-service", "redis-cache"],
+    &["api-gateway", "user-service", "postgres-db"],
+    &["api-gateway", "user-service", "auth-service", "redis-cache"],
+    &[
+        "api-gateway",
+        "order-service",
+        "payment-service",
+        "notification-service",
+    ],
+    &[
+        "api-gateway",
+        "order-service",
+        "inventory-service",
+        "postgres-db",
+    ],
+    &[
+        "api-gateway",
+        "recommendation-service",
+        "redis-cache",
+        "postgres-db",
+    ],
+    &[
+        "api-gateway",
+        "order-service",
+        "user-service",
+        "postgres-db",
+    ],
+    &[
+        "api-gateway",
+        "auth-service",
+        "user-service",
+        "notification-service",
+    ],
+    &[
+        "api-gateway",
+        "order-service",
+        "payment-service",
+        "postgres-db",
+    ],
+    &[
+        "api-gateway",
+        "inventory-service",
+        "recommendation-service",
+        "redis-cache",
+    ],
+];
+
+/// Severity for a hop; drives generated span status.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Severity {
+    Info,
+    Warn,
+    Error,
+}
+
+impl Severity {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Info => "info",
+            Self::Warn => "warn",
+            Self::Error => "error",
+        }
+    }
+}
+
+/// Rich set of OTel semantic attributes attached to a hop span.
+#[derive(Debug, Clone, Default)]
+pub struct SpanAttrs {
+    pub http_method: Option<&'static str>,
+    pub http_route: Option<String>,
+    pub http_status_code: Option<u16>,
+    pub db_system: Option<&'static str>,
+    pub db_statement: Option<String>,
+    pub rpc_service: Option<String>,
+    pub rpc_method: Option<String>,
+    pub error_message: Option<String>,
+}
+
+/// A single hop in a distributed trace.
+#[derive(Debug, Clone)]
+pub struct Hop {
+    pub service: &'static str,
+    pub operation: String,
+    pub duration_ms_range: Range<u64>,
+    pub severity: Severity,
+    pub attrs: SpanAttrs,
+}
+
+/// A complete trace plan with a chain of hops and pre-sampled sleep durations.
+#[derive(Debug, Clone)]
+pub struct TracePlan {
+    pub chain: Vec<Hop>,
+    pub hop_sleep_ms: Vec<u64>,
+    pub total_duration_ms: u64,
+    pub has_error: bool,
+}
+
+/// Defines the set of synthetic services and fixed call chains.
+pub struct ServiceCallGraph {
+    error_rate: f64,
+}
+
+impl Default for ServiceCallGraph {
+    fn default() -> Self {
+        Self::new(&mut rand::thread_rng())
+    }
+}
+
+impl ServiceCallGraph {
+    /// Create a new graph with a random error rate between 10–90%.
+    pub fn new(rng: &mut impl Rng) -> Self {
+        Self {
+            error_rate: rng.gen_range(0.10..=0.90),
+        }
+    }
+
+    pub fn error_rate(&self) -> f64 {
+        self.error_rate
+    }
+
+    /// Picks a random fixed call chain, applies error injection at the configured
+    /// rate, and returns a fully-sampled trace plan.
+    pub fn sample_trace(&self, rng: &mut impl Rng) -> TracePlan {
+        let chain_template = CALL_CHAINS.choose(rng).expect("call chains not empty");
+        let depth = chain_template.len();
+        let mut chain: Vec<Hop> = Vec::with_capacity(depth);
+
+        let inject_error = rng.gen_bool(self.error_rate);
+        let error_idx = if inject_error {
+            rng.gen_range(1..depth)
+        } else {
+            usize::MAX
+        };
+
+        for (i, &svc) in chain_template.iter().enumerate() {
+            let is_errored = i == error_idx;
+            let is_downstream_of_error = inject_error && i > error_idx;
+
+            let severity = if is_errored {
+                Severity::Error
+            } else if is_downstream_of_error {
+                Severity::Warn
+            } else {
+                Severity::Info
+            };
+
+            let (op, mut attrs) = build_service_attrs(svc, is_errored, rng);
+
+            if is_errored {
+                attrs.error_message = Some(sample_error_message(svc, rng));
+            }
+
+            let base_range = match svc {
+                s if s.contains("postgres") => 8..180,
+                s if s.contains("redis") => 1..25,
+                _ => 5..120,
+            };
+
+            let duration_ms_range: Range<u64> = if is_errored {
+                let start = base_range.end;
+                start..start.saturating_mul(3).min(HOP_SLEEP_CAP_MS)
+            } else if rng.gen_bool(LATENCY_OUTLIER_PROBABILITY) {
+                let factor: u64 = rng.gen_range(3..=10);
+                let start = base_range.start.saturating_mul(factor);
+                let end = base_range.end.saturating_mul(factor).min(HOP_SLEEP_CAP_MS);
+                start..end.max(start + 1)
+            } else {
+                base_range
+            };
+
+            chain.push(Hop {
+                service: svc,
+                operation: op,
+                duration_ms_range,
+                severity,
+                attrs,
+            });
+        }
+
+        let hop_sleep_ms: Vec<u64> = chain
+            .iter()
+            .map(|h| {
+                rng.gen_range(h.duration_ms_range.clone())
+                    .min(HOP_SLEEP_CAP_MS)
+            })
+            .collect();
+        let total_duration_ms: u64 = hop_sleep_ms.iter().sum();
+
+        TracePlan {
+            has_error: inject_error,
+            chain,
+            hop_sleep_ms,
+            total_duration_ms,
+        }
+    }
+}
+
+fn build_service_attrs(svc: &str, is_errored: bool, rng: &mut impl Rng) -> (String, SpanAttrs) {
+    let mut attrs = SpanAttrs::default();
+
+    match svc {
+        "api-gateway" => {
+            let routes = [
+                "/api/v1/users",
+                "/api/v1/orders",
+                "/api/v1/products",
+                "/api/v1/search",
+            ];
+            let methods: &[&str] = &["GET", "POST", "PUT", "DELETE"];
+            let method = *methods.choose(rng).unwrap_or(&"GET");
+            let route = *routes.choose(rng).unwrap_or(&"/api/v1/users");
+            let status = if is_errored {
+                *[500u16, 502, 503, 504].choose(rng).unwrap_or(&500)
+            } else {
+                *[200u16, 200, 200, 201, 204, 304]
+                    .choose(rng)
+                    .unwrap_or(&200)
+            };
+            attrs.http_method = Some(method);
+            attrs.http_route = Some(route.to_string());
+            attrs.http_status_code = Some(status);
+            (format!("HTTP {method} {route}"), attrs)
+        }
+        "postgres-db" => {
+            let tables = ["users", "orders", "events", "sessions", "products"];
+            let ops = ["SELECT", "INSERT", "UPDATE", "DELETE"];
+            let op = *ops.choose(rng).unwrap_or(&"SELECT");
+            let table = *tables.choose(rng).unwrap_or(&"users");
+            attrs.db_system = Some("postgresql");
+            attrs.db_statement = Some(format!("{op} * FROM {table} WHERE id = $1"));
+            (format!("{op} {table}"), attrs)
+        }
+        "redis-cache" => {
+            let ops = ["GET", "SET", "DEL", "HGET", "EXPIRE", "INCR"];
+            let keys = [
+                "session:abc",
+                "cache:products",
+                "rate:limit",
+                "user:profile",
+            ];
+            let op = *ops.choose(rng).unwrap_or(&"GET");
+            let key = *keys.choose(rng).unwrap_or(&"session:abc");
+            attrs.db_system = Some("redis");
+            attrs.db_statement = Some(format!("{op} {key}"));
+            (format!("{op} {key}"), attrs)
+        }
+        "notification-service" => {
+            let methods = ["SendEmail", "SendPush", "SendSMS", "SendWebhook"];
+            let method = *methods.choose(rng).unwrap_or(&"SendEmail");
+            attrs.rpc_service = Some("NotificationService".to_string());
+            attrs.rpc_method = Some(method.to_string());
+            (method.to_string(), attrs)
+        }
+        "recommendation-service" => {
+            attrs.rpc_service = Some("RecommendationService".to_string());
+            attrs.rpc_method = Some("RankCandidates".to_string());
+            ("RankCandidates".to_string(), attrs)
+        }
+        _ => {
+            let methods = [
+                "Checkout",
+                "Authorize",
+                "FetchProfile",
+                "Reserve",
+                "Validate",
+                "Process",
+            ];
+            let method = *methods.choose(rng).unwrap_or(&"Process");
+            let svc_name = svc
+                .split('-')
+                .map(|w| {
+                    let mut c = w.chars();
+                    match c.next() {
+                        None => String::new(),
+                        Some(f) => f.to_uppercase().to_string() + c.as_str(),
+                    }
+                })
+                .collect::<String>();
+            attrs.rpc_service = Some(svc_name);
+            attrs.rpc_method = Some(method.to_string());
+            (format!("rpc.{method}"), attrs)
+        }
+    }
+}
+
+fn sample_error_message(svc: &str, rng: &mut impl Rng) -> String {
+    let generic = [
+        "connection refused",
+        "deadline exceeded (timeout 5s)",
+        "service unavailable: circuit breaker open",
+        "internal server error",
+        "resource exhausted: too many requests",
+    ];
+    let db_errors = [
+        "ERROR: deadlock detected",
+        "ERROR: relation \"temp_table\" does not exist",
+        "ERROR: could not serialize access due to concurrent update",
+        "connection pool exhausted (max_size=20)",
+    ];
+    let cache_errors = [
+        "CLUSTERDOWN The cluster is down",
+        "LOADING Redis is loading the dataset in memory",
+        "OOM command not allowed when used memory > maxmemory",
+    ];
+
+    match svc {
+        s if s.contains("postgres") => {
+            (*db_errors.choose(rng).unwrap_or(&db_errors[0])).to_string()
+        }
+        s if s.contains("redis") => {
+            (*cache_errors.choose(rng).unwrap_or(&cache_errors[0])).to_string()
+        }
+        _ => (*generic.choose(rng).unwrap_or(&generic[0])).to_string(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn sample_trace_follows_fixed_chain() {
+        let g = ServiceCallGraph::default();
+        let mut rng = rand::thread_rng();
+        for _ in 0..50 {
+            let p = g.sample_trace(&mut rng);
+            assert!(p.chain.len() >= 3, "chain must have >= 3 hops");
+            assert_eq!(
+                p.chain[0].service, "api-gateway",
+                "first hop is always api-gateway"
+            );
+            assert!(p.total_duration_ms > 0);
+            assert_eq!(p.hop_sleep_ms.len(), p.chain.len());
+            assert_eq!(p.total_duration_ms, p.hop_sleep_ms.iter().sum::<u64>());
+        }
+    }
+
+    #[test]
+    fn error_rate_within_range() {
+        let mut rng = rand::thread_rng();
+        for _ in 0..20 {
+            let g = ServiceCallGraph::new(&mut rng);
+            assert!((0.10..=0.90).contains(&g.error_rate()));
+        }
+    }
+
+    #[test]
+    fn error_traces_have_error_severity() {
+        let g = ServiceCallGraph { error_rate: 0.5 };
+        let mut rng = rand::thread_rng();
+        let mut found_error = false;
+        for _ in 0..100 {
+            let p = g.sample_trace(&mut rng);
+            if p.has_error {
+                assert!(
+                    p.chain.iter().any(|h| h.severity == Severity::Error),
+                    "error trace must have at least one errored hop"
+                );
+                found_error = true;
+            }
+        }
+        assert!(
+            found_error,
+            "should generate at least one error trace in 100 samples at 50% rate"
+        );
+    }
+}

@@ -1,0 +1,585 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "vaduga-mapgl-datasource",
+        "uid": "mapgl-tempo-dataframes"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "dark-green",
+                "value": 20
+              },
+              {
+                "color": "#EF843C",
+                "value": 45
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 60
+              },
+              {
+                "color": "#EAB839",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 21,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "basemap": {
+          "config": {},
+          "name": "Layer 0",
+          "type": "blank"
+        },
+        "common": {
+          "edgeRouting": "Splines",
+          "hideDiagnostics": true,
+          "isAppAuth": false,
+          "isMeters": false,
+          "isShowEdgeLegend": true,
+          "isShowLegend": true,
+          "isShowSwitcher": true,
+          "jitterPoints": false,
+          "locLabelName": "",
+          "nsPrefix": "cmn",
+          "updatesLog": false
+        },
+        "controls": {},
+        "dataLayers": [
+          {
+            "config": {
+              "arcConfig": {
+                "capacity": {
+                  "fixed": 1
+                },
+                "height": 0.5,
+                "tiltIncrement": 7
+              },
+              "arcStyle": {
+                "sideA": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                },
+                "sideB": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                }
+              },
+              "edgeStyle": {
+                "color": {
+                  "field": "errorRate",
+                  "fixed": "dark-blue"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "fixed": 5,
+                  "max": 20,
+                  "min": 5
+                },
+                "textConfig": {
+                  "fontSize": 14
+                }
+              },
+              "groups": [
+                {
+                  "color": "#56A64B",
+                  "iconName": "",
+                  "label": "ok",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "dark-green"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "none"
+                },
+                {
+                  "color": "#bc2638",
+                  "iconName": "databases/pouchdb",
+                  "label": "errors > 80%",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "red"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "canvasTint"
+                },
+                {
+                  "color": "#FF780A",
+                  "iconName": "",
+                  "label": "> 45%",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "#EF843C"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "markup"
+                },
+                {
+                  "color": "#96D98D",
+                  "iconName": "",
+                  "label": "base",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "green"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "markup"
+                },
+                {
+                  "color": "#31c0cc",
+                  "iconName": "",
+                  "label": "> 60%",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "#6ED0E0"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "markup"
+                },
+                {
+                  "color": "#F2CC0C",
+                  "iconName": "",
+                  "label": "> 75%",
+                  "offset": 0,
+                  "overrides": [
+                    {
+                      "name": "thrColor",
+                      "type": "enum",
+                      "value": [
+                        "#EAB839"
+                      ]
+                    }
+                  ],
+                  "svgTintMode": "markup"
+                }
+              ],
+              "isWrapEdges": 0,
+              "showStat2": false,
+              "style": {
+                "arcs": [
+                  {
+                    "field": "",
+                    "fixed": ""
+                  }
+                ],
+                "arrow": 0,
+                "color": {
+                  "field": "errorRate",
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "field": "errorRate",
+                  "fixed": 25,
+                  "max": 80,
+                  "min": 35
+                },
+                "text": {
+                  "field": "source",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14
+                },
+                "useGroups": true
+              }
+            },
+            "displayProperties": [
+              "type",
+              "spanCount",
+              "errorCount",
+              "errorRate"
+            ],
+            "isShowTooltip": true,
+            "locField": "source",
+            "location": {
+              "mode": "auto"
+            },
+            "name": "services",
+            "query": {
+              "id": "byRefId",
+              "options": "Services"
+            },
+            "type": "markers"
+          },
+          {
+            "config": {
+              "arcConfig": {
+                "capacity": {
+                  "fixed": 1
+                },
+                "height": 0.5
+              },
+              "arcStyle": {
+                "sideA": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                },
+                "sideB": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                }
+              },
+              "edgeStyle": {
+                "arrow": 1,
+                "color": {
+                  "fixed": "#5680c0"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "fixed": 5,
+                  "max": 20,
+                  "min": 5
+                },
+                "textConfig": {
+                  "fontSize": 14
+                }
+              },
+              "groups": [],
+              "showStat2": false,
+              "style": {
+                "arrow": 0,
+                "color": {
+                  "fixed": "light-green"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "fixed": 25,
+                  "max": 20,
+                  "min": 5
+                },
+                "textConfig": {
+                  "fontSize": 14
+                },
+                "useGroups": true
+              }
+            },
+            "displayProperties": [
+              "type",
+              "avgBranchLinkCost"
+            ],
+            "isShowTooltip": true,
+            "locField": "source",
+            "location": {
+              "mode": "auto"
+            },
+            "name": "service edges",
+            "opacity": 0.4,
+            "parField": "target",
+            "query": {
+              "id": "byRefId",
+              "options": "Service edges"
+            },
+            "type": "markers"
+          },
+          {
+            "config": {
+              "arcConfig": {
+                "capacity": {
+                  "fixed": 1
+                },
+                "height": 0.5,
+                "tiltIncrement": 7
+              },
+              "arcStyle": {
+                "sideA": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                },
+                "sideB": {
+                  "arrow": 0,
+                  "color": {
+                    "fixed": "dark-green"
+                  },
+                  "opacity": 0.4,
+                  "size": {
+                    "fixed": 5,
+                    "max": 20,
+                    "min": 5
+                  },
+                  "textConfig": {
+                    "fontSize": 14
+                  }
+                }
+              },
+              "edgeStyle": {
+                "arrow": 1,
+                "color": {
+                  "field": "linkCost",
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "field": "linkCost",
+                  "fixed": 5,
+                  "max": 15,
+                  "min": 2
+                },
+                "text": {
+                  "field": "totalCost",
+                  "fixed": "",
+                  "mode": "field"
+                },
+                "textConfig": {
+                  "fontSize": 14
+                }
+              },
+              "groups": [],
+              "isWrapEdges": 0,
+              "showStat2": false,
+              "style": {
+                "arrow": 0,
+                "color": {
+                  "field": "linkCost",
+                  "fixed": "dark-green"
+                },
+                "opacity": 0.4,
+                "size": {
+                  "fixed": 25,
+                  "max": 20,
+                  "min": 5
+                },
+                "textConfig": {
+                  "fontSize": 14
+                },
+                "useGroups": true
+              }
+            },
+            "displayProperties": [
+              "type",
+              "traceId",
+              "spanIds",
+              "linkKey",
+              "branchIndex",
+              "linkIndex",
+              "linkCost"
+            ],
+            "edgeIdField": "traceId",
+            "isShowTooltip": true,
+            "locField": "source",
+            "location": {
+              "mode": "auto"
+            },
+            "name": "traces",
+            "opacity": 0.4,
+            "parField": "target",
+            "query": {
+              "id": "byRefId",
+              "options": "Traces"
+            },
+            "type": "markers"
+          }
+        ],
+        "isEditable": true,
+        "tooltip": {
+          "mode": "details"
+        },
+        "updatesLog": false,
+        "view": {
+          "allLayers": true,
+          "id": "fit",
+          "lat": 458.634455,
+          "lon": 359.821796,
+          "zoom": 9
+        }
+      },
+      "pluginVersion": "2.9.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "vaduga-mapgl-datasource",
+            "uid": "mapgl-tempo-dataframes"
+          },
+          "refId": "Traces",
+          "resultMode": "traceBranches",
+          "traceId": ""
+        },
+        {
+          "datasource": {
+            "type": "vaduga-mapgl-datasource",
+            "uid": "mapgl-tempo-dataframes"
+          },
+          "refId": "Service edges"
+        },
+        {
+          "datasource": {
+            "type": "vaduga-mapgl-datasource",
+            "uid": "mapgl-tempo-dataframes"
+          },
+          "refId": "Services"
+        }
+      ],
+      "title": "Traces+Service dependency graph",
+      "type": "vaduga-mapglpro-panel"
+    }
+  ],
+  "preload": false,
+  "refresh": "",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "1",
+          "value": "1"
+        },
+        "name": "routed",
+        "options": [
+          {
+            "text": "1",
+            "value": "1"
+          },
+          {
+            "text": "0",
+            "value": "0"
+          }
+        ],
+        "type": "switch"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Mapgl Service graph",
+  "uid": "33f9075c-015b-4498-a6f4-c02a469b2093",
+  "version": 7,
+  "weekStart": ""
+}

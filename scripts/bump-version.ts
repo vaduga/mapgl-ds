@@ -1,0 +1,91 @@
+#!/usr/bin/env bun
+/**
+ * Bump version across package.json, plugin.json, and all Cargo.toml files.
+ *
+ * Usage:
+ *   bun run bump <newVersion>   — set an explicit version
+ *   bun run bump patch          — 1.0.0 → 1.0.1
+ *   bun run bump minor          — 1.0.0 → 1.1.0
+ *   bun run bump major          — 1.0.0 → 2.0.0
+ */
+
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+
+const root = path.resolve(import.meta.dirname, '..');
+
+type Increment = 'major' | 'minor' | 'patch';
+const INCREMENTS: Increment[] = ['major', 'minor', 'patch'];
+
+function currentVersion(): string {
+  const pkg = JSON.parse(readFileSync(path.join(root, 'package.json'), 'utf8')) as {
+    version: string;
+  };
+  return pkg.version;
+}
+
+function incrementVersion(current: string, level: Increment): string {
+  const parts = current.split('.').map(Number) as [number, number, number];
+  const idx = INCREMENTS.indexOf(level);
+  parts[idx] += 1;
+  for (let i = idx + 1; i < 3; i++) parts[i] = 0;
+  return parts.join('.');
+}
+
+const arg = process.argv[2];
+let version: string;
+
+if (!arg) {
+  console.error('Usage: bun run bump <major|minor|patch|x.y.z>');
+  console.error('Examples:');
+  console.error('  bun run bump patch   # 1.0.0 → 1.0.1');
+  console.error('  bun run bump minor   # 1.0.0 → 1.1.0');
+  console.error('  bun run bump major   # 1.0.0 → 2.0.0');
+  console.error('  bun run bump 2.3.0   # set explicit version');
+  process.exit(1);
+}
+
+if ((INCREMENTS as string[]).includes(arg)) {
+  const cur = currentVersion();
+  version = incrementVersion(cur, arg as Increment);
+  console.log(`${arg}: ${cur} → ${version}\n`);
+} else if (/^\d+\.\d+\.\d+/.test(arg)) {
+  version = arg;
+} else {
+  console.error(`Invalid argument: "${arg}". Use major, minor, patch, or a semver string.`);
+  process.exit(1);
+}
+
+const today = new Date().toISOString().slice(0, 10);
+
+function updateJson(filePath: string, updater: (obj: Record<string, unknown>) => void): void {
+  const raw = readFileSync(filePath, 'utf8');
+  const obj = JSON.parse(raw) as Record<string, unknown>;
+  updater(obj);
+  writeFileSync(filePath, `${JSON.stringify(obj, null, 2)}\n`, 'utf8');
+  console.log(`  ✓ ${filePath}`);
+}
+
+function updateToml(filePath: string, ver: string): void {
+  let raw = readFileSync(filePath, 'utf8');
+  raw = raw.replace(/^version\s*=\s*"[^"]*"/m, `version = "${ver}"`);
+  writeFileSync(filePath, raw, 'utf8');
+  console.log(`  ✓ ${filePath}`);
+}
+
+console.log(`Bumping to ${version} (${today})\n`);
+
+updateJson(path.join(root, 'package.json'), (pkg) => {
+  pkg.version = version;
+});
+
+updateJson(path.join(root, 'plugin.json'), (plugin) => {
+  const info = plugin.info as Record<string, unknown>;
+  info.version = version;
+  info.updated = today;
+});
+
+updateToml(path.join(root, 'agent-core/Cargo.toml'), version);
+updateToml(path.join(root, 'otel-mock/Cargo.toml'), version);
+
+console.log(`\nDone. Run 'bun run build' to include the new version in dist.`);

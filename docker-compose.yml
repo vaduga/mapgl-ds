@@ -1,0 +1,75 @@
+# @managed by create-grafana-plugin — do not edit
+name: vaduga-mapgl-ds
+
+services:
+  grafana:
+    container_name: vaduga-mapgl-ds-grafana
+    image: grafana/grafana:12.4.3-security-02
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=vaduga-mapgl-datasource,vaduga-mapglpro-panel
+      - GF_PLUGINS_ENABLE_ALPHA=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_LOG_LEVEL=info
+      - GF_PATHS_PLUGINS=/var/lib/grafana-plugins
+    volumes:
+      - ./docker_data/grafana_plugins:/var/lib/grafana-plugins
+      - ./dist/vaduga-mapgl-datasource:/var/lib/grafana-plugins/vaduga-mapgl-datasource:ro
+      - ./dist_pro:/var/lib/grafana-plugins/vaduga-mapglpro-panel:ro
+      - ./provisioning:/etc/grafana/provisioning
+      - ./docker_data/grafana_data:/var/lib/grafana
+    networks:
+      - vaduga-mapgl-ds-net
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    depends_on:
+      - tempo
+
+  otel-mock:
+    container_name: vaduga-mapgl-ds-otel-mock
+    build:
+      context: .
+      dockerfile: otel-mock/Dockerfile
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
+      OTEL_MOCK_TICK_MS: "15000"
+      RUST_LOG: info
+    networks:
+      - vaduga-mapgl-ds-net
+    deploy:
+      resources:
+        limits:
+          memory: 128m
+    depends_on:
+      - tempo
+
+  tempo:
+    container_name: vaduga-mapgl-ds-tempo
+    image: grafana/tempo:2.6.1
+    user: root
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+    volumes:
+      - ./provisioning/tempo/tempo.yml:/etc/tempo/tempo.yml
+      - tempo-data:/var/lib/tempo
+    networks:
+      - vaduga-mapgl-ds-net
+    deploy:
+      resources:
+        limits:
+          memory: 756m
+    command:
+      - -config.file=/etc/tempo/tempo.yml
+
+networks:
+  vaduga-mapgl-ds-net:
+    name: vaduga-mapgl-ds-net
+    driver: bridge
+
+volumes:
+  tempo-data:

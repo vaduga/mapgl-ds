@@ -1,0 +1,18 @@
+# @managed by create-grafana-plugin — do not edit
+FROM rust:1-bookworm AS builder
+WORKDIR /app
+COPY otel-mock/Cargo.toml ./
+COPY otel-mock/src ./src
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/app/target \
+    cargo build --release && \
+    cp target/release/otel-mock /tmp/otel-mock
+
+FROM debian:bookworm-slim
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=builder /tmp/otel-mock /usr/local/bin/otel-mock
+USER nobody
+ENTRYPOINT ["/usr/local/bin/otel-mock"]
