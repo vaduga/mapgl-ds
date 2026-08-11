@@ -1,12 +1,12 @@
-#!/usr/bin/env bun
+#!/usr/bin/env -S node --experimental-strip-types
 /**
  * Bump version across package.json, plugin.json, and all Cargo.toml files.
  *
  * Usage:
- *   bun run bump <newVersion>   — set an explicit version
- *   bun run bump patch          — 1.0.0 → 1.0.1
- *   bun run bump minor          — 1.0.0 → 1.1.0
- *   bun run bump major          — 1.0.0 → 2.0.0
+ *   npm run bump -- <newVersion>   — set an explicit version
+ *   npm run bump -- patch          — 1.0.0 → 1.0.1
+ *   npm run bump -- minor          — 1.0.0 → 1.1.0
+ *   npm run bump -- major          — 1.0.0 → 2.0.0
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -36,12 +36,12 @@ const arg = process.argv[2];
 let version: string;
 
 if (!arg) {
-  console.error('Usage: bun run bump <major|minor|patch|x.y.z>');
+  console.error('Usage: npm run bump -- <major|minor|patch|x.y.z>');
   console.error('Examples:');
-  console.error('  bun run bump patch   # 1.0.0 → 1.0.1');
-  console.error('  bun run bump minor   # 1.0.0 → 1.1.0');
-  console.error('  bun run bump major   # 1.0.0 → 2.0.0');
-  console.error('  bun run bump 2.3.0   # set explicit version');
+  console.error('  npm run bump -- patch   # 1.0.0 → 1.0.1');
+  console.error('  npm run bump -- minor   # 1.0.0 → 1.1.0');
+  console.error('  npm run bump -- major   # 1.0.0 → 2.0.0');
+  console.error('  npm run bump -- 2.3.0   # set explicit version');
   process.exit(1);
 }
 
@@ -88,4 +88,4 @@ updateJson(path.join(root, 'plugin.json'), (plugin) => {
 updateToml(path.join(root, 'wasm-core/Cargo.toml'), version);
 updateToml(path.join(root, 'otel-mock/Cargo.toml'), version);
 
-console.log(`\nDone. Run 'bun run build' to include the new version in dist.`);
+console.log(`\nDone. Run 'npm run build' to include the new version in dist.`);

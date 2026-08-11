@@ -1,5 +1,4 @@
-// DOM environment setup for bun test using happy-dom.
-// Loaded via bunfig.toml [test].preload before any test files run.
+// Optional DOM environment setup for tests that need Happy DOM explicitly.
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 
 GlobalRegistrator.register();

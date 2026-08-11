@@ -4,7 +4,7 @@ context: |
   Project: vaduga-mapgl-datasource
   Product type: Grafana frontend datasource plugin
   Runtime: React 18 + TypeScript datasource frontend, Rust WASM analysis engine, Grafana datasource proxy, Tempo
-  Package manager: bun
+  Package manager: npm
   Build: Rspack AMD bundle plus wasm-pack output
   Local stack: Grafana, Tempo, OTLP trace mock
   Scope: traces, Tempo querying, span DataFrames, service graph DataFrames, trace branch service graph analytics

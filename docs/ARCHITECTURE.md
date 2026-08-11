@@ -96,4 +96,4 @@ The stack intentionally excludes metrics and logs services.
 
 ## Build Artifacts
 
-`bun run build` builds the Rust WASM package and the Grafana plugin bundle. Rspack writes the plugin to `dist/vaduga-mapgl-datasource`, which is the directory mounted into Grafana by Docker Compose.
+`npm run build` builds the Rust WASM package and the Grafana plugin bundle. Rspack writes the plugin to `dist/vaduga-mapgl-datasource`, which is the directory mounted into Grafana by Docker Compose.

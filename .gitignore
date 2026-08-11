@@ -1,6 +1,7 @@
 # Node.js
 node_modules/
-package-lock.json
+/.cache/
+/*.zip
 
 # Rust
 /target/

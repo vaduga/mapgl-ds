@@ -1,8 +1,8 @@
 import path from 'node:path';
 
-import grafanaConfig from './.config/rspack/rspack.config.js';
+import grafanaConfig from './.config/webpack/webpack.config.js';
 
-/** @type {(env?: Record<string, unknown>) => import('@rspack/core').Configuration} */
+/** @type {(env?: Record<string, unknown>) => import('webpack').Configuration} */
 export default function config(env = {}) {
   const baseConfig = grafanaConfig(env);
 
@@ -19,7 +19,7 @@ export default function config(env = {}) {
       rules: [
         ...(baseConfig.module?.rules ?? []),
         {
-          // The bridge synchronously initializes wasm-bindgen from an inlined data URL.
+          // Keep Webpack behavior identical to the synchronous WASM Rspack bridge.
           test: /\.wasm$/,
           type: 'asset/inline',
         },

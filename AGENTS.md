@@ -8,14 +8,14 @@ It is the single source of truth — IDE-specific config files should reference 
 - **Project**: Grafana Observability Agent Panel — AI-powered root cause analysis plugin
 - **Architecture**: React 18 (TypeScript) frontend + Rust WASM analysis engine
 - **Docs**: `docs/DESIGN.md` (architecture), `docs/PRD.md` (product requirements)
-- **Build**: Rspack (AMD output), bun (package manager), wasm-pack (Rust→WASM)
-- **Test**: bun test (frontend), cargo test (Rust)
+- **Build**: Rspack (AMD output), npm (package manager), wasm-pack (Rust→WASM)
+- **Test**: Jest (frontend), cargo test (Rust)
 
 ## Language & Style
 
 - Git commit messages: **English**
 - Code comments: **English**
-- User-facing documentation: **Chinese (Simplified)** unless otherwise specified
+- User-facing documentation: **English**
 - Comments explain *why*, not *what* — never restate the code
 
 ## Verification Before Commit
@@ -23,7 +23,7 @@ It is the single source of truth — IDE-specific config files should reference 
 **CRITICAL**: Before producing a commit, run the full verification pipeline:
 
 ```bash
-bun run verify    # lint (TS + Rust) → test (bun test + cargo test) → build:ts
+npm run verify    # lint (TS + Rust) → test (Jest + cargo test) → build:rspack
 ```
 
 If any check fails, fix the issue before committing. Never skip verification.

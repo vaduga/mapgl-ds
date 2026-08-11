@@ -6,5 +6,5 @@ const outDir = path.resolve(import.meta.dirname, '../dist/vaduga-mapgl-datasourc
 await mkdir(outDir, { recursive: true });
 const entries = await readdir(outDir, { withFileTypes: true });
 await Promise.all(
-  entries.map((e) => rm(path.join(outDir, e.name), { recursive: true, force: true })),
+  entries.map((entry) => rm(path.join(outDir, entry.name), { recursive: true, force: true })),
 );
