@@ -3,7 +3,7 @@ name: vaduga-mapgl-ds
 services:
   grafana:
     container_name: vaduga-mapgl-ds-grafana
-    image: grafana/grafana:12.4.3-security-02
+    image: grafana/grafana:${GRAFANA_VERSION:-12.4.3-security-02}
     ports:
       - "3000:3000"
     environment:
@@ -26,8 +26,15 @@ services:
       resources:
         limits:
           memory: 512m
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
     depends_on:
-      - tempo
+      tempo:
+        condition: service_healthy
 
   otel-mock:
     container_name: vaduga-mapgl-ds-otel-mock
@@ -36,7 +43,8 @@ services:
       dockerfile: otel-mock/Dockerfile
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://tempo:4317
-      OTEL_MOCK_TICK_MS: "15000"
+      # Generate enough traces for a reviewer to see a populated dashboard quickly.
+      OTEL_MOCK_TICK_MS: "5000"
       RUST_LOG: info
     networks:
       - vaduga-mapgl-ds-net
@@ -45,7 +53,8 @@ services:
         limits:
           memory: 128m
     depends_on:
-      - tempo
+      tempo:
+        condition: service_healthy
 
   tempo:
     container_name: vaduga-mapgl-ds-tempo
@@ -59,6 +68,12 @@ services:
       - tempo-data:/var/lib/tempo
     networks:
       - vaduga-mapgl-ds-net
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider 'http://localhost:3200/api/search?limit=1' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
     deploy:
       resources:
         limits:

@@ -1,6 +1,6 @@
 import type { DataSourcePluginOptionsEditorProps, QueryEditorProps } from '@grafana/data';
 import { InlineField, Input, Select, Stack } from '@grafana/ui';
-import type React from 'react';
+import React from 'react';
 import type { DataSource } from '../DataSource';
 import {
   resolveTempoDataFrameResultMode,

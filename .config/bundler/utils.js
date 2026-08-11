@@ -12,7 +12,7 @@ export function getPackageJson() {
 }
 
 export function getPluginJson() {
-  return loadJson(path.resolve(process.cwd(), 'plugin.json'));
+  return loadJson(path.resolve(process.cwd(), 'src/plugin.json'));
 }
 
 export function getCreatePluginVersion() {

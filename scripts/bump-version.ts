@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --experimental-strip-types
 /**
- * Bump version across package.json, plugin.json, and all Cargo.toml files.
+ * Bump version across package.json, src/plugin.json, and all Cargo.toml files.
  *
  * Usage:
  *   npm run bump -- <newVersion>   — set an explicit version
@@ -79,7 +79,7 @@ updateJson(path.join(root, 'package.json'), (pkg) => {
   pkg.version = version;
 });
 
-updateJson(path.join(root, 'plugin.json'), (plugin) => {
+updateJson(path.join(root, 'src/plugin.json'), (plugin) => {
   const info = plugin.info as Record<string, unknown>;
   info.version = version;
   info.updated = today;

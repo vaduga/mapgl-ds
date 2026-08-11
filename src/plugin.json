@@ -6,7 +6,7 @@
   "metrics": true,
   "tracing": true,
   "info": {
-    "keywords": ["tempo", "traces","service graph", "service dependency graph", "node graph"],
+    "keywords": ["tempo", "traces", "service graph", "service dependency graph", "node graph"],
     "description": "Frontend datasource for querying Tempo traces and returning span rows for Mapgl panel plugin node graph.",
     "author": {
       "name": "Vadim Pyatakov"
@@ -23,6 +23,10 @@
       {
         "name": "Documentation",
         "url": "https://mapgl.org/documentation"
+      },
+      {
+        "name": "Repository",
+        "url": "https://github.com/vaduga/mapgl-ds"
       }
     ],
     "screenshots": [

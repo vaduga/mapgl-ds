@@ -9,7 +9,7 @@ const logoPaths = Array.from(
 const screenshotPaths = pluginJson.info?.screenshots?.map(({ path }) => path) ?? [];
 
 export const copyFilePatterns = [
-  { from: 'plugin.json', to: '.', context: process.cwd() },
+  { from: 'src/plugin.json', to: 'plugin.json', context: process.cwd() },
   {
     from: hasSourceReadme() ? 'src/README.md' : 'README.md',
     to: 'README.md',

@@ -1,40 +1,88 @@
 name: CI
+
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  lint-and-test:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
-      - run: cargo install wasm-pack
-      - run: bun install
-      - run: bun run build:wasm
-      - run: bun run lint
-      - run: bun run test
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - run: npm ci
+      - run: npm run build:wasm
+      - run: npm run verify
+      - run: npm run build:webpack
 
   build:
     runs-on: ubuntu-latest
-    needs: lint-and-test
+    needs: verify
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-      - run: cargo install wasm-pack
-      - run: bun install
-      - run: bun run build
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - run: npm ci
+      - run: npm run build
       - uses: actions/upload-artifact@v4
         with:
-          name: plugin-dist
-          path: dist/
+          name: vaduga-mapgl-datasource
+          path: dist/vaduga-mapgl-datasource/
+          if-no-files-found: error
           retention-days: 7
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        grafana-version: ['11.6.0', '12.4.3-security-02']
+    env:
+      GRAFANA_VERSION: ${{ matrix.grafana-version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - run: npm ci
+      - run: npm exec playwright install --with-deps chromium
+      - run: npm run build
+      - run: docker compose up --detach --build --wait
+      - run: npm run e2e
+      - name: Print service logs after a failure
+        if: failure()
+        run: docker compose logs --no-color
+      - name: Stop the demo stack
+        if: always()
+        run: docker compose down --volumes

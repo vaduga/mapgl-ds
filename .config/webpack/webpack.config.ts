@@ -19,7 +19,7 @@ export default function grafanaWebpackConfig(env = {}) {
   return {
     context: path.resolve(process.cwd(), SOURCE_DIR),
     mode: production ? 'production' : 'development',
-    devtool: production ? false : 'eval-source-map',
+    devtool: 'source-map',
     entry: { module: './module.ts' },
     output: {
       clean: false,
@@ -43,7 +43,7 @@ export default function grafanaWebpackConfig(env = {}) {
             options: {
               jsc: {
                 parser: { syntax: 'typescript', tsx: true },
-                transform: { react: { runtime: 'automatic' } },
+                transform: { react: { runtime: 'classic' } },
                 target: 'es2020',
               },
             },

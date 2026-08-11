@@ -26,6 +26,9 @@ wasm-core/pkg/
 
 # Test coverage
 coverage/
+/e2e-results/
+/playwright-report/
+/playwright/.auth/
 
 # ESLint
 .eslintcache

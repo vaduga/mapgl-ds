@@ -1,4 +1,5 @@
 name: Release
+
 on:
   push:
     tags: ['v*']
@@ -6,18 +7,25 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
-      - run: cargo install wasm-pack
-      - run: bun install
-      - run: bun run build:wasm
-      - run: bun run lint
-      - run: bun run test
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - run: npm ci
+      - run: npm run build:wasm
+      - run: npm run verify
+      - run: npm run build:webpack
 
   release:
     runs-on: ubuntu-latest
@@ -28,53 +36,62 @@ jobs:
       GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: wasm32-unknown-unknown
-      - run: cargo install wasm-pack
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: wasm-pack
+      - run: npm ci
 
       - name: Extract version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - run: bun install
-      - run: bun run build
+      - run: npm run build
 
       - name: Verify version consistency
+        env:
+          TAG_VERSION: ${{ steps.version.outputs.VERSION }}
         run: |
-          PKG_VER=$(bun -e "console.log(require('./package.json').version)")
-          PLUGIN_VER=$(bun -e "console.log(require('./plugin.json').info.version)")
-          TAG_VER="${{ steps.version.outputs.VERSION }}"
-          echo "package.json: $PKG_VER"
-          echo "plugin.json:  $PLUGIN_VER"
-          echo "tag:          $TAG_VER"
-          if [ "$PKG_VER" != "$TAG_VER" ] || [ "$PLUGIN_VER" != "$TAG_VER" ]; then
-            echo "::error::Version mismatch! Run 'bun run bump $TAG_VER' and commit before tagging."
+          PACKAGE_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version")
+          PLUGIN_VERSION=$(node -p "JSON.parse(require('fs').readFileSync('src/plugin.json', 'utf8')).info.version")
+          echo "package.json:   $PACKAGE_VERSION"
+          echo "src/plugin.json: $PLUGIN_VERSION"
+          echo "tag:            $TAG_VERSION"
+          if [ "$PACKAGE_VERSION" != "$TAG_VERSION" ] || [ "$PLUGIN_VERSION" != "$TAG_VERSION" ]; then
+            echo "::error::Version mismatch. Run 'npm run bump -- $TAG_VERSION' and commit before tagging."
             exit 1
           fi
 
       - name: Sign plugin
-        run: npx @grafana/sign-plugin@latest
         if: env.GRAFANA_ACCESS_POLICY_TOKEN != ''
-
-      - name: Validate plugin
-        run: npx @grafana/plugin-validator@latest -sourceCodeUri file://. dist/grafana-observability-agent-panel
-        continue-on-error: true
+        run: npm run sign
 
       - name: Package plugin
-        run: |
-          cd dist
-          tar czf grafana-observability-agent-panel-${{ steps.version.outputs.VERSION }}.tar.gz grafana-observability-agent-panel/
-          sha256sum grafana-observability-agent-panel-${{ steps.version.outputs.VERSION }}.tar.gz > checksums.txt
-          cat checksums.txt
+        working-directory: dist
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: zip -qr "vaduga-mapgl-datasource-${VERSION}.zip" vaduga-mapgl-datasource
+
+      - name: Validate plugin archive
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: npx --yes @grafana/plugin-validator@latest -sourceCodeUri file://. -jsonOutput "dist/vaduga-mapgl-datasource-${VERSION}.zip"
+
+      - name: Generate checksum
+        working-directory: dist
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+        run: sha256sum "vaduga-mapgl-datasource-${VERSION}.zip" > checksums.txt
 
       - uses: softprops/action-gh-release@v2
         with:
           files: |
-            dist/grafana-observability-agent-panel-${{ steps.version.outputs.VERSION }}.tar.gz
+            dist/vaduga-mapgl-datasource-${{ steps.version.outputs.VERSION }}.zip
             dist/checksums.txt
           generate_release_notes: true

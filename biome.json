@@ -7,6 +7,7 @@
     "lineWidth": 100
   },
   "javascript": {
+    "jsxRuntime": "reactClassic",
     "formatter": {
       "quoteStyle": "single",
       "trailingCommas": "all",

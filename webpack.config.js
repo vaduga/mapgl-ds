@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import grafanaConfig from './.config/webpack/webpack.config.js';
+import grafanaConfig from './.config/webpack/webpack.config.ts';
 
 /** @type {(env?: Record<string, unknown>) => import('webpack').Configuration} */
 export default function config(env = {}) {

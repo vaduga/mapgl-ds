@@ -28,6 +28,13 @@ docker compose up -d
 
 Open <http://localhost:3000> after the containers start.
 
+The demo emits synthetic traces every five seconds and keeps Tempo data in the
+`tempo-data` Docker volume for up to 24 hours. To reset the demo data completely:
+
+```bash
+docker compose down -v
+```
+
 ## Development workflow
 
 ```bash
@@ -55,8 +62,17 @@ npm run build:wasm
 # Run Jest and Cargo tests
 npm run test
 
+# Run the TypeScript compiler without emitting files
+npm run typecheck
+
 # Watch frontend tests
 npm run test:watch
+
+# Start the complete local demo stack
+npm run server
+
+# Run the Grafana Playwright smoke tests against the local stack
+npm run e2e
 ```
 
 ## Code quality
@@ -74,9 +90,27 @@ npm run format
 # Check formatting without modifying files
 npm run format:check
 
-# Run lint, tests, and the production frontend build
+# Run lint, type checking, tests, and the production Rspack build
 npm run verify
 ```
+
+CI additionally builds the frontend through `webpack.config.js` for scaffold and
+validator compatibility, then runs the E2E suite against Grafana 11.6 and the
+current demo version.
+
+## Packaging and signing
+
+```bash
+# Build a catalog-compatible ZIP archive in dist/
+npm run package
+
+# Sign the built plugin when GRAFANA_ACCESS_POLICY_TOKEN is available
+npm run sign
+```
+
+Tag releases must match the versions in `package.json` and `src/plugin.json`.
+Use `npm run bump -- patch`, `minor`, `major`, or an explicit semantic version
+before creating a release tag.
 
 ### TypeScript
 
