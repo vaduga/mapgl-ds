@@ -2,10 +2,12 @@
 
 Grafana frontend datasource for querying Tempo traces and returning trace and service-graph DataFrames for the Mapgl panel.
 
+For a repeatable catalog review, see [REVIEW.md](./REVIEW.md).
+
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 20 or newer with npm
-- [Rust toolchain](https://rustup.rs/) (`rustup`, including `cargo`)
+- [Rust toolchain](https://rustup.rs/) installed with `rustup` (the default toolchain includes `rustc` and `cargo`)
 - [wasm-pack](https://rustwasm.github.io/wasm-pack/) — installed automatically by `npm run setup`
 - Docker (for local Grafana)
 

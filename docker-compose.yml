@@ -17,7 +17,7 @@ services:
     volumes:
       - ./docker_data/grafana_plugins:/var/lib/grafana-plugins
       - ./dist/vaduga-mapgl-datasource:/var/lib/grafana-plugins/vaduga-mapgl-datasource:ro
-      - ./dist_pro:/var/lib/grafana-plugins/vaduga-mapglpro-panel:ro
+#      - ./dist_pro:/var/lib/grafana-plugins/vaduga-mapglpro-panel:ro
       - ./provisioning:/etc/grafana/provisioning
       - ./docker_data/grafana_data:/var/lib/grafana
     networks:
