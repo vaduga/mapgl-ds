@@ -1,5 +1,5 @@
 import type { DataSourcePluginOptionsEditorProps, QueryEditorProps } from '@grafana/data';
-import { InlineField, Input, Select, Stack } from '@grafana/ui';
+import { DataSourceHttpSettings, InlineField, Input, Select, Stack } from '@grafana/ui';
 import React from 'react';
 import type { DataSource } from '../DataSource';
 import {
@@ -137,16 +137,26 @@ export const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsCh
   };
 
   return (
-    <InlineField label="Default limit" tooltip="Used when a query does not specify a limit.">
-      <Input
-        width={12}
-        type="number"
-        min={1}
-        max={500}
-        value={options.jsonData.defaultLimit ?? ''}
-        placeholder="20"
-        onChange={onDefaultLimitChange}
+    <Stack direction="column" gap={4}>
+      <DataSourceHttpSettings
+        defaultUrl="http://tempo:3200"
+        dataSourceConfig={options}
+        onChange={onOptionsChange}
+        showAccessOptions
+        urlLabel="Tempo URL"
+        urlDocs="The Tempo HTTP endpoint reachable from the Grafana server."
       />
-    </InlineField>
+      <InlineField label="Default limit" tooltip="Used when a query does not specify a limit.">
+        <Input
+          width={12}
+          type="number"
+          min={1}
+          max={500}
+          value={options.jsonData.defaultLimit ?? ''}
+          placeholder="20"
+          onChange={onDefaultLimitChange}
+        />
+      </InlineField>
+    </Stack>
   );
 };
