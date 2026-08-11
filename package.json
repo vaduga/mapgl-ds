@@ -72,5 +72,12 @@
   },
   "overrides": {
     "react-data-grid": "7.0.0-beta.56"
+  },
+  "allowScripts": {
+    "@fission-ai/openspec": true,
+    "@swc/core": true,
+    "core-js@2.6.12": true,
+    "protobufjs": true,
+    "unrs-resolver@1.12.2": true
   }
 }

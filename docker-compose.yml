@@ -7,7 +7,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=vaduga-mapgl-datasource,vaduga-mapglpro-panel
+      - GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=vaduga-mapgl-datasource,vaduga-mapgl-panel, vaduga-mapglpro-panel
       - GF_INSTALL_PLUGINS=vaduga-mapgl-panel
       - GF_PLUGINS_ENABLE_ALPHA=true
       - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -15,11 +15,11 @@ services:
       - GF_LOG_LEVEL=info
       - GF_PATHS_PLUGINS=/var/lib/grafana-plugins
     volumes:
-      - ./docker_data/grafana_plugins:/var/lib/grafana-plugins
+      - $PWD/docker_data/grafana_plugins:/var/lib/grafana-plugins
       - ./dist/vaduga-mapgl-datasource:/var/lib/grafana-plugins/vaduga-mapgl-datasource:ro
 #      - ./dist_pro:/var/lib/grafana-plugins/vaduga-mapglpro-panel:ro
       - ./provisioning:/etc/grafana/provisioning
-      - ./docker_data/grafana_data:/var/lib/grafana
+      - $PWD/docker_data/grafana_data:/var/lib/grafana
     networks:
       - vaduga-mapgl-ds-net
     deploy:
