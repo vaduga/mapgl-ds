@@ -21,10 +21,6 @@
         "url": "https://mapgl.org"
       },
       {
-        "name": "Documentation",
-        "url": "https://mapgl.org/documentation"
-      },
-      {
         "name": "Repository",
         "url": "https://github.com/vaduga/mapgl-ds"
       }
