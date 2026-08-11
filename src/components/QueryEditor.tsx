@@ -1,5 +1,12 @@
 import type { DataSourcePluginOptionsEditorProps, QueryEditorProps } from '@grafana/data';
-import { DataSourceHttpSettings, InlineField, Input, Select, Stack } from '@grafana/ui';
+import {
+  AdvancedHttpSettings,
+  Auth,
+  ConfigSection,
+  ConnectionSettings,
+  convertLegacyAuthProps,
+} from '@grafana/plugin-ui';
+import { InlineField, Input, Select, Stack } from '@grafana/ui';
 import React from 'react';
 import type { DataSource } from '../DataSource';
 import {
@@ -138,25 +145,37 @@ export const ConfigEditor: React.FC<ConfigEditorProps> = ({ options, onOptionsCh
 
   return (
     <Stack direction="column" gap={4}>
-      <DataSourceHttpSettings
-        defaultUrl="http://tempo:3200"
-        dataSourceConfig={options}
+      <ConnectionSettings
+        config={options}
         onChange={onOptionsChange}
-        showAccessOptions
+        urlPlaceholder="http://tempo:3200"
         urlLabel="Tempo URL"
-        urlDocs="The Tempo HTTP endpoint reachable from the Grafana server."
+        urlTooltip="The Tempo HTTP endpoint reachable from the Grafana server."
       />
-      <InlineField label="Default limit" tooltip="Used when a query does not specify a limit.">
-        <Input
-          width={12}
-          type="number"
-          min={1}
-          max={500}
-          value={options.jsonData.defaultLimit ?? ''}
-          placeholder="20"
-          onChange={onDefaultLimitChange}
-        />
-      </InlineField>
+      <Auth {...convertLegacyAuthProps({ config: options, onChange: onOptionsChange })} />
+      <ConfigSection
+        title="Query defaults"
+        description="Defaults applied when a query does not provide an explicit value."
+      >
+        <InlineField label="Default limit" tooltip="Used when a query does not specify a limit.">
+          <Input
+            width={12}
+            type="number"
+            min={1}
+            max={500}
+            value={options.jsonData.defaultLimit ?? ''}
+            placeholder="20"
+            onChange={onDefaultLimitChange}
+          />
+        </InlineField>
+      </ConfigSection>
+      <ConfigSection
+        title="Advanced settings"
+        description="Optional HTTP settings for requests sent through the Grafana server."
+        isCollapsible
+      >
+        <AdvancedHttpSettings config={options} onChange={onOptionsChange} />
+      </ConfigSection>
     </Stack>
   );
 };

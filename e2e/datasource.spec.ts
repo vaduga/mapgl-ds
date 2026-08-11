@@ -13,7 +13,10 @@ test('renders the datasource configuration editor', async ({
   });
   const configPage = await createDataSourceConfigPage({ type: dataSource.type });
 
-  await expect(configPage.ctx.page.getByRole('textbox', { name: /Tempo URL/ })).toBeVisible();
+  await expect(configPage.ctx.page.getByText(/Tempo URL/)).toBeVisible();
+  await expect(
+    configPage.ctx.page.getByRole('textbox', { name: 'Data source connection URL' }),
+  ).toBeVisible();
   await expect(configPage.ctx.page.getByText('Default limit', { exact: true })).toBeVisible();
 });
 

@@ -31,8 +31,12 @@
     ],
     "screenshots": [
       {
-        "name": "Screenshot 0",
-        "path": "img/screenshots/screenshot.png"
+        "name": "Traces on service graph",
+        "path": "img/screenshots/screenshot1.png"
+      },
+      {
+        "name": "Query options",
+        "path": "img/screenshots/screenshot2.png"
       }
     ],
     "version": "0.1.0",
