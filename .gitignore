@@ -7,8 +7,10 @@ node_modules/
 /target/
 wasm-core/target/
 
-# WASM build output
-wasm-core/pkg/
+# WASM build output. Keep the generated JS glue tracked because it is referenced
+# by the production source map and must be available at the release tag.
+wasm-core/pkg/*
+!wasm-core/pkg/agent_core.js
 
 # Build output
 /dist/

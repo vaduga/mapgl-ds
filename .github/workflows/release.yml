@@ -21,9 +21,10 @@ jobs:
           components: clippy, rustfmt
       - uses: taiki-e/install-action@v2
         with:
-          tool: wasm-pack
+          tool: wasm-pack@0.15.0
       - run: npm ci
       - run: npm run build:wasm
+      - run: git diff --exit-code -- wasm-core/pkg/agent_core.js
       - run: npm run verify
       - run: npm run build:webpack
 
@@ -45,7 +46,7 @@ jobs:
           targets: wasm32-unknown-unknown
       - uses: taiki-e/install-action@v2
         with:
-          tool: wasm-pack
+          tool: wasm-pack@0.15.0
       - run: npm ci
 
       - name: Extract version from tag
@@ -53,6 +54,9 @@ jobs:
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - run: npm run build
+
+      - name: Verify generated WASM glue
+        run: git diff --exit-code -- wasm-core/pkg/agent_core.js
 
       - name: Verify version consistency
         env:
@@ -81,13 +85,16 @@ jobs:
       - name: Validate plugin archive
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
-        run: npx --yes @grafana/plugin-validator@latest -sourceCodeUri file://. -jsonOutput "dist/vaduga-mapgl-datasource-${VERSION}.zip"
+        run: >-
+          npx --yes @grafana/plugin-validator@latest
+          -sourceCodeUri "https://github.com/${GITHUB_REPOSITORY}/tree/${GITHUB_REF_NAME}"
+          -jsonOutput "dist/vaduga-mapgl-datasource-${VERSION}.zip"
 
-      - name: Generate checksum
+      - name: Generate SHA1 checksum
         working-directory: dist
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
-        run: sha256sum "vaduga-mapgl-datasource-${VERSION}.zip" > checksums.txt
+        run: sha1sum "vaduga-mapgl-datasource-${VERSION}.zip" > checksums.txt
 
       - uses: softprops/action-gh-release@v2
         with:

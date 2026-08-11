@@ -7,7 +7,7 @@
   "author": "Vadim Pyatakov",
   "license": "GPL-3.0",
   "scripts": {
-    "setup": "rustup target add wasm32-unknown-unknown && cargo install wasm-pack cargo-watch && npm install && npm run build:wasm",
+    "setup": "rustup target add wasm32-unknown-unknown && cargo install wasm-pack --version 0.15.0 --locked && cargo install cargo-watch --locked && npm install && npm run build:wasm",
     "dev": "echo \"$(date +%H:%M:%S) [WASM] Initial build...\" && npm run build:wasm && echo \"$(date +%H:%M:%S) [WASM] Initial build done\" && echo \"$(date +%H:%M:%S) [DEV] Starting watchers...\" && rspack build --config rspack.config.js --watch & (cd wasm-core && cargo watch --postpone -w src -s 'echo \"$(date +%H:%M:%S) [WASM] Compiling...\" && wasm-pack build --target web && echo \"$(date +%H:%M:%S) [WASM] Build done\"') & wait",
     "dev:ts": "echo \"$(date +%H:%M:%S) [DEV:TS] Starting watcher...\" && rspack build --config rspack.config.js --watch",
     "dev:rust": "cd wasm-core && cargo watch -w src -s 'echo \"$(date +%H:%M:%S) [WASM] Compiling...\" && wasm-pack build --target web && echo \"$(date +%H:%M:%S) [WASM] Build done\"'",
