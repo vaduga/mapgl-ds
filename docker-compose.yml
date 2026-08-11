@@ -2,6 +2,9 @@ name: vaduga-mapgl-ds
 
 services:
   grafana:
+    extends:
+      file: .config/docker-compose-base.yaml
+      service: grafana
     container_name: vaduga-mapgl-ds-grafana
     image: grafana/grafana:${GRAFANA_VERSION:-12.4.3-security-02}
     ports:
