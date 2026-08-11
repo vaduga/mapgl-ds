@@ -1,6 +1,7 @@
 {
   "name": "vaduga-mapgl-datasource",
   "version": "0.1.0",
+  "description": "Mapgl Traces",
   "type": "module",
   "packageManager": "npm@11.18.0",
   "author": "Vadim Pyatakov",

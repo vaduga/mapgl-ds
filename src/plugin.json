@@ -7,7 +7,7 @@
   "tracing": true,
   "info": {
     "keywords": ["tempo", "traces", "service graph", "service dependency graph", "node graph"],
-    "description": "Frontend datasource for querying Tempo traces and returning span rows for Mapgl panel plugin node graph.",
+    "description": "Query Tempo to render traces with Mapgl panel node graph.",
     "author": {
       "name": "Vadim Pyatakov"
     },
