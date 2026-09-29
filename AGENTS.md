@@ -9,7 +9,7 @@ Keep project guidance aligned with the code and the documents listed below.
 - **Plugin type**: Datasource. It queries Tempo through Grafana's datasource proxy, normalizes traces internally, and returns service graph, trace branch, and directed link comparison DataFrames.
 - **Integration**: The separate Mapgl panel can visualize service graph results. This repository does not implement that panel, an AI root-cause agent, or a Grafana backend plugin.
 - **Architecture**: React 18 and TypeScript use Grafana's datasource APIs. The Rust crate in `wasm-core` provides trace and graph analysis through WebAssembly; TypeScript parsing and fallback behavior live in `src/`.
-- **Build**: Rspack emits the Grafana AMD bundle. The generated WASM glue and binary are checked in, so `npm run build` does not require Rust. `npm run build:wasm` regenerates those files after Rust changes.
+- **Build**: Webpack emits the Grafana AMD bundle using the standard `@grafana/create-plugin` configuration. The generated WASM glue and binary are checked in, so `npm run build` does not require Rust. `npm run build:wasm` regenerates those files after Rust changes. Rspack remains available for the frontend development watcher.
 - **Package manager**: npm. Rust tooling is optional for ordinary builds and is prepared with `npm run setup:rust` when needed.
 - **Docs**: `docs/PRD.md` describes scope, `docs/ARCHITECTURE.md` describes runtime and data flow, and `docs/ROADMAP.md` tracks planned work.
 
@@ -37,7 +37,7 @@ npm run build:wasm     # regenerate WASM after Rust changes; requires Rust and w
 npm run test           # Jest and agent-core Rust tests
 npm run lint           # Biome plus Rust clippy and formatting checks
 npm run typecheck      # TypeScript type check
-npm run verify         # lint, typecheck, tests, and Rspack build
+npm run verify         # lint, typecheck, tests, and Webpack build
 npm run e2e            # Playwright tests against the local Grafana stack
 ```
 

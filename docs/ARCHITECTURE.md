@@ -96,4 +96,4 @@ The stack intentionally excludes metrics and logs services.
 
 ## Build Artifacts
 
-`npm run build` bundles the Grafana plugin with the checked-in Rust WASM module, so reviewers can build without installing Rust. After changing the Rust crate, regenerate the tracked WASM glue and binary with `npm run build:wasm`. Rspack writes the plugin to `dist/vaduga-mapgl-datasource`, which is the directory mounted into Grafana by Docker Compose.
+`npm run build` bundles the Grafana plugin with the checked-in Rust WASM module through the standard Webpack configuration, so reviewers can build without installing Rust. After changing the Rust crate, regenerate the tracked WASM glue and binary with `npm run build:wasm`. Webpack writes the plugin to `dist/vaduga-mapgl-datasource`, which is the directory mounted into Grafana by Docker Compose. Rspack remains available for the frontend development watcher.

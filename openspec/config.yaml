@@ -5,7 +5,7 @@ context: |
   Product type: Grafana frontend datasource plugin
   Runtime: React 18 + TypeScript datasource frontend, Rust WASM analysis engine, Grafana datasource proxy, Tempo
   Package manager: npm
-  Build: Rspack AMD bundle plus wasm-pack output
+  Build: standard Grafana Webpack AMD bundle using the checked-in WASM artifact; wasm-pack regenerates WASM after Rust changes
   Local stack: Grafana, Tempo, OTLP trace mock
   Scope: traces, Tempo querying, span DataFrames, service graph DataFrames, trace branch service graph analytics
   Non-goals: Prometheus metrics, Loki logs, LLM incident reports, old Grafana panel UI

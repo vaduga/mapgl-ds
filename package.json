@@ -12,8 +12,9 @@
     "dev": "echo \"$(date +%H:%M:%S) [WASM] Initial build...\" && npm run build:wasm && echo \"$(date +%H:%M:%S) [WASM] Initial build done\" && echo \"$(date +%H:%M:%S) [DEV] Starting watchers...\" && rspack build --config rspack.config.js --watch & (cd wasm-core && cargo watch --postpone -w src -s 'echo \"$(date +%H:%M:%S) [WASM] Compiling...\" && wasm-pack build --target web && echo \"$(date +%H:%M:%S) [WASM] Build done\"') & wait",
     "dev:ts": "echo \"$(date +%H:%M:%S) [DEV:TS] Starting watcher...\" && rspack build --config rspack.config.js --watch",
     "dev:rust": "cd wasm-core && cargo watch -w src -s 'echo \"$(date +%H:%M:%S) [WASM] Compiling...\" && wasm-pack build --target web && echo \"$(date +%H:%M:%S) [WASM] Build done\"'",
-    "build": "npm run build:rspack",
+    "build": "npm run build:webpack",
     "build:rspack": "echo \"$(date +%H:%M:%S) [TS] Building Tempo datasource...\" && node scripts/clean-plugin-dist.mjs && rspack build --config rspack.config.js --env production",
+    "build:webpack": "echo \"$(date +%H:%M:%S) [TS] Building Tempo datasource with Webpack...\" && node scripts/clean-plugin-dist.mjs && webpack --config webpack.config.js --env production",
     "build:wasm": "echo \"$(date +%H:%M:%S) [WASM] Building...\" && cd wasm-core && wasm-pack build --target web && rm -f pkg/.gitignore && echo \"$(date +%H:%M:%S) [WASM] Build done\"",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:ts && npm run test:rust",
@@ -38,7 +39,7 @@
     "bump": "node --experimental-strip-types scripts/bump-version.ts",
     "package": "echo \"$(date +%H:%M:%S) [PKG] Packaging...\" && npm run build && VER=$(node -p \"JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version\") && cd dist && zip -FSqr vaduga-mapgl-datasource-$VER.zip vaduga-mapgl-datasource && echo \"$(date +%H:%M:%S) [PKG] Done: vaduga-mapgl-datasource-$VER.zip\"",
     "dev:reload": "echo \"$(date +%H:%M:%S) [RELOAD] Building and restarting Grafana...\" && npm run build && docker compose up -d grafana --force-recreate && echo \"$(date +%H:%M:%S) [RELOAD] Done\"",
-    "verify": "echo \"$(date +%H:%M:%S) [VERIFY] Starting...\" && npm run lint && npm run typecheck && npm run test && npm run build:rspack && echo \"$(date +%H:%M:%S) [VERIFY] All checks passed\""
+    "verify": "echo \"$(date +%H:%M:%S) [VERIFY] Starting...\" && npm run lint && npm run typecheck && npm run test && npm run build:webpack && echo \"$(date +%H:%M:%S) [VERIFY] All checks passed\""
   },
   "dependencies": {
     "@grafana/data": "^13.2.2",
@@ -55,16 +56,21 @@
     "@grafana/sign-plugin": "^3.3.3",
     "@happy-dom/global-registrator": "^20.14.5",
     "@playwright/test": "^1.63.0",
+    "copy-webpack-plugin": "^14.0.0",
     "@rspack/cli": "^2.2.8",
     "@rspack/core": "^2.2.8",
     "@swc/core": "^1.16.2",
     "@swc/jest": "^0.2.39",
+    "swc-loader": "^0.2.7",
+    "terser-webpack-plugin": "^5.3.16",
     "@types/jest": "^30.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "webpack": "^5.109.2",
+    "webpack-cli": "^7.2.2"
   },
   "overrides": {
     "react-data-grid": "7.0.0-beta.56"

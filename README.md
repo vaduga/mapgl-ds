@@ -58,10 +58,10 @@ npm run dev:ts
 # Watch the Rust WASM crate only (requires `npm run setup:rust`)
 npm run dev:rust
 
-# Build the production Rspack bundle using the checked-in WASM module
+# Build the production Grafana plugin with Webpack and the checked-in WASM module
 npm run build
 
-# Build the frontend with Rspack only
+# Build an optional Rspack frontend bundle
 npm run build:rspack
 
 # Regenerate WASM after changing Rust (requires `npm run setup:rust`)
@@ -98,11 +98,11 @@ npm run format
 # Check formatting without modifying files
 npm run format:check
 
-# Run lint, type checking, tests, and the production Rspack build
+# Run lint, type checking, tests, and the production Webpack build
 npm run verify
 ```
 
-CI builds the frontend with Rspack through `npm run verify`, then runs the E2E
+CI builds the frontend with Webpack through `npm run verify`, then runs the E2E
 suite against Grafana 11.6 and the current demo version.
 
 ## Packaging and signing
