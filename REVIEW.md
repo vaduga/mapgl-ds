@@ -6,19 +6,12 @@ These steps exercise `vaduga-mapgl-datasource` (`vaduga-mapgl-datasource`, versi
 
 - Docker Engine with Docker Compose v2
 - Node.js 20 or newer with npm
-- Rust stable installed through [rustup](https://rustup.rs/); the default Rust toolchain installed by `rustup` includes both `rustc` and `cargo`
 - Network access for the initial npm and Docker image/plugin downloads
 - Ports `3000`, `3200`, and `4317` available
 
-`wasm-pack` does not need to be installed separately: `npm run setup` installs it and the required Rust/WASM target.
-
-Verify the Rust tools are available before continuing:
-
-```bash
-rustup --version
-rustc --version
-cargo --version
-```
+The repository includes the generated WASM module, so Rust and `wasm-pack` are
+not needed to build or explore this release. Rebuilding WASM is optional and is
+only needed when Rust sources change.
 
 ## Review the plugin
 
@@ -31,10 +24,10 @@ cargo --version
    git checkout <commit-or-tag>
    ```
 
-2. Install the toolchain and dependencies, then build the WASM bridge and frontend:
+2. Install the JavaScript dependencies and build the plugin:
 
    ```bash
-   npm run setup
+   npm ci
    npm run build
    ```
 
@@ -62,9 +55,14 @@ From the repository root:
 
 ```bash
 npm run verify
-npm run build:webpack
 npm run e2e
 ```
+
+These checks are optional for exploring the plugin. `npm run verify` includes
+Rust linting and tests; building and running the plugin only requires Node.js.
+To regenerate the checked-in WASM artifact after Rust changes, run
+`npm run setup:rust` once with Rust stable installed through rustup, then
+`npm run build:wasm`.
 
 The E2E checks require the Docker stack and a Chromium browser. Install Chromium once if needed with `npx playwright install chromium`.
 

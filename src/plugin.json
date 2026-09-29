@@ -6,8 +6,15 @@
   "metrics": true,
   "tracing": true,
   "info": {
-    "keywords": ["tempo", "traces", "service graph", "service dependency graph", "node graph"],
-    "description": "Query Tempo to render traces with Mapgl panel node graph.",
+    "keywords": [
+      "tempo",
+      "traces",
+      "service graph",
+      "service dependency graph",
+      "node graph",
+      "mapgl"
+    ],
+    "description": "Tempo traces datasource for Mapgl panel node graph.",
     "author": {
       "name": "Vadim Pyatakov"
     },

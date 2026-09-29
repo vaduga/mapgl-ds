@@ -24,39 +24,26 @@ jobs:
           tool: wasm-pack@0.15.0
       - run: npm ci
       - run: npm run build:wasm
-      - run: git diff --exit-code -- wasm-core/pkg/agent_core.js
+      - run: git diff --exit-code -- wasm-core/pkg/agent_core.js wasm-core/pkg/agent_core_bg.wasm
       - run: npm run verify
-      - run: npm run build:webpack
 
   release:
     runs-on: ubuntu-latest
     needs: validate
     permissions:
       contents: write
-    env:
-      GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+      id-token: write
+      attestations: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: wasm-pack@0.15.0
-      - run: npm ci
 
       - name: Extract version from tag
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
-
-      - run: npm run build
-
-      - name: Verify generated WASM glue
-        run: git diff --exit-code -- wasm-core/pkg/agent_core.js
 
       - name: Verify version consistency
         env:
@@ -72,33 +59,9 @@ jobs:
             exit 1
           fi
 
-      - name: Sign plugin
-        if: env.GRAFANA_ACCESS_POLICY_TOKEN != ''
-        run: npm run sign
-
-      - name: Package plugin
-        working-directory: dist
-        env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
-        run: zip -qr "vaduga-mapgl-datasource-${VERSION}.zip" vaduga-mapgl-datasource
-
-      - name: Validate plugin archive
-        env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
-        run: >-
-          npx --yes @grafana/plugin-validator@latest
-          -sourceCodeUri "https://github.com/${GITHUB_REPOSITORY}/tree/${GITHUB_REF_NAME}"
-          -jsonOutput "dist/vaduga-mapgl-datasource-${VERSION}.zip"
-
-      - name: Generate SHA1 checksum
-        working-directory: dist
-        env:
-          VERSION: ${{ steps.version.outputs.VERSION }}
-        run: sha1sum "vaduga-mapgl-datasource-${VERSION}.zip" > checksums.txt
-
-      - uses: softprops/action-gh-release@v2
+      # This pinned Grafana action signs, validates, packages, and attests the release archive.
+      - uses: grafana/plugin-actions/build-plugin@build-plugin/v1.2.0
         with:
-          files: |
-            dist/vaduga-mapgl-datasource-${{ steps.version.outputs.VERSION }}.zip
-            dist/checksums.txt
-          generate_release_notes: true
+          policy_token: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }}
+          attestation: true
+          node-version: '22'

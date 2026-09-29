@@ -22,10 +22,9 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "types": [],
-    "baseUrl": ".",
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   },

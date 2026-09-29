@@ -24,8 +24,8 @@ jobs:
           tool: wasm-pack
       - run: npm ci
       - run: npm run build:wasm
+      - run: git diff --exit-code -- wasm-core/pkg/agent_core.js wasm-core/pkg/agent_core_bg.wasm
       - run: npm run verify
-      - run: npm run build:webpack
 
   build:
     runs-on: ubuntu-latest
@@ -36,12 +36,6 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: wasm-pack
       - run: npm ci
       - run: npm run build
       - uses: actions/upload-artifact@v4
@@ -66,12 +60,6 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: wasm32-unknown-unknown
-      - uses: taiki-e/install-action@v2
-        with:
-          tool: wasm-pack
       - run: npm ci
       - run: npm exec playwright install --with-deps chromium
       - run: npm run build

@@ -1,15 +1,16 @@
 # Mapgl Tempo DataFrames Datasource
 
-Grafana frontend datasource for querying Tempo traces and returning trace and service-graph DataFrames for the Mapgl panel.
+Grafana frontend datasource for Tempo traces to render on a service dependency graph using Mapgl panel plugin.
 
 For a repeatable catalog review, see [REVIEW.md](./REVIEW.md).
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) 20 or newer with npm
-- [Rust toolchain](https://rustup.rs/) installed with `rustup` (the default toolchain includes `rustc` and `cargo`)
-- [wasm-pack](https://rustwasm.github.io/wasm-pack/) — installed automatically by `npm run setup`
 - Docker (for local Grafana)
+
+The generated WASM module is included in the repository, so building and
+reviewing the plugin does not require Rust.
 
 ## Development setup
 
@@ -17,11 +18,10 @@ For a repeatable catalog review, see [REVIEW.md](./REVIEW.md).
 git clone https://github.com/vaduga/mapgl-ds.git
 cd mapgl-ds
 
-# Installs the wasm32 target, wasm-pack, cargo-watch, and JS dependencies,
-# then builds the WASM package.
+# Installs JavaScript dependencies only.
 npm run setup
 
-# Build the plugin
+# Build the plugin using the checked-in WASM module.
 npm run build
 
 # Start the local Grafana and Tempo stack
@@ -29,6 +29,15 @@ docker compose up -d
 ```
 
 Open <http://localhost:3000> after the containers start.
+
+To change the Rust analysis engine, install Rust stable through
+[rustup](https://rustup.rs/), then add the WASM build tools and regenerate the
+checked-in files:
+
+```bash
+npm run setup:rust
+npm run build:wasm
+```
 
 The demo emits synthetic traces every five seconds and keeps Tempo data in the
 `tempo-data` Docker volume for up to 24 hours. To reset the demo data completely:
@@ -40,25 +49,22 @@ docker compose down -v
 ## Development workflow
 
 ```bash
-# Watch the TypeScript and Rust sources
+# Watch TypeScript and Rust sources (requires `npm run setup:rust`)
 npm run dev
 
 # Watch the frontend only
 npm run dev:ts
 
-# Watch the Rust WASM crate only
+# Watch the Rust WASM crate only (requires `npm run setup:rust`)
 npm run dev:rust
 
-# Build the WASM package and production Rspack bundle
+# Build the production Rspack bundle using the checked-in WASM module
 npm run build
 
 # Build the frontend with Rspack only
 npm run build:rspack
 
-# Build the frontend with the validator-compatible Webpack config
-npm run build:webpack
-
-# Build the WASM package only
+# Regenerate WASM after changing Rust (requires `npm run setup:rust`)
 npm run build:wasm
 
 # Run Jest and Cargo tests
@@ -96,9 +102,8 @@ npm run format:check
 npm run verify
 ```
 
-CI additionally builds the frontend through `webpack.config.js` for scaffold and
-validator compatibility, then runs the E2E suite against Grafana 11.6 and the
-current demo version.
+CI builds the frontend with Rspack through `npm run verify`, then runs the E2E
+suite against Grafana 11.6 and the current demo version.
 
 ## Packaging and signing
 

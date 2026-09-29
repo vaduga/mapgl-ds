@@ -1,106 +1,86 @@
 # AI Coding Standards
 
-This file defines coding standards for AI assistants working on this project.
-It is the single source of truth — IDE-specific config files should reference this.
+This file defines coding standards for assistants working in this repository.
+Keep project guidance aligned with the code and the documents listed below.
 
 ## Project Context
 
-- **Project**: Grafana Observability Agent Panel — AI-powered root cause analysis plugin
-- **Architecture**: React 18 (TypeScript) frontend + Rust WASM analysis engine
-- **Docs**: `docs/DESIGN.md` (architecture), `docs/PRD.md` (product requirements)
-- **Build**: Rspack (AMD output), npm (package manager), wasm-pack (Rust→WASM)
-- **Test**: Jest (frontend), cargo test (Rust)
+- **Project**: Mapgl Traces, a Grafana frontend datasource for Tempo traces.
+- **Plugin type**: Datasource. It queries Tempo through Grafana's datasource proxy, normalizes traces internally, and returns service graph, trace branch, and directed link comparison DataFrames.
+- **Integration**: The separate Mapgl panel can visualize service graph results. This repository does not implement that panel, an AI root-cause agent, or a Grafana backend plugin.
+- **Architecture**: React 18 and TypeScript use Grafana's datasource APIs. The Rust crate in `wasm-core` provides trace and graph analysis through WebAssembly; TypeScript parsing and fallback behavior live in `src/`.
+- **Build**: Rspack emits the Grafana AMD bundle. The generated WASM glue and binary are checked in, so `npm run build` does not require Rust. `npm run build:wasm` regenerates those files after Rust changes.
+- **Package manager**: npm. Rust tooling is optional for ordinary builds and is prepared with `npm run setup:rust` when needed.
+- **Docs**: `docs/PRD.md` describes scope, `docs/ARCHITECTURE.md` describes runtime and data flow, and `docs/ROADMAP.md` tracks planned work.
 
-## Language & Style
+## Repository Layout
 
-- Git commit messages: **English**
-- Code comments: **English**
-- User-facing documentation: **English**
-- Comments explain *why*, not *what* — never restate the code
+- `src/DataSource.ts`: Tempo requests and Grafana DataFrame creation.
+- `src/tempoSearch.ts` and `src/tempoParser.ts`: Tempo search parameters and trace parsing.
+- `src/components/QueryEditor.tsx`: datasource query and configuration editors.
+- `src/types.ts`: query and datasource settings types.
+- `src/wasmBridge.ts`: TypeScript boundary to the generated WASM module.
+- `wasm-core/src/`: Rust trace, branch, and service graph analysis.
+- `wasm-core/pkg/`: generated WASM glue and binary used by the default build.
+- `tests/unit/`: Jest unit tests; `e2e/`: Playwright tests.
+- `otel-mock/`: local synthetic trace generator used by Docker Compose.
+- `docs/`: current product, architecture, roadmap, and integration notes.
 
-## Verification Before Commit
+Add code beside the existing feature it supports. Do not assume scaffold folders such as `src/services/`, `src/utils/`, or `tests/fixtures/` exist.
 
-**CRITICAL**: Before producing a commit, run the full verification pipeline:
+## Common Commands
 
 ```bash
-npm run verify    # lint (TS + Rust) → test (Jest + cargo test) → build:rspack
+npm run setup          # install JavaScript dependencies
+npm run build          # build with the checked-in WASM artifact; no Rust required
+npm run build:wasm     # regenerate WASM after Rust changes; requires Rust and wasm-pack
+npm run test           # Jest and agent-core Rust tests
+npm run lint           # Biome plus Rust clippy and formatting checks
+npm run typecheck      # TypeScript type check
+npm run verify         # lint, typecheck, tests, and Rspack build
+npm run e2e            # Playwright tests against the local Grafana stack
 ```
 
-If any check fails, fix the issue before committing. Never skip verification.
+`npm run verify` and `npm run e2e` require their respective Rust and Docker/browser tooling. For a catalog reviewer, `npm ci`, `npm run build`, and the Docker stack are sufficient to build and explore the plugin.
 
-## Pre-Commit Self-Check
+## Language and Style
 
-1. Does the change match the architectural patterns in `docs/DESIGN.md`?
-2. Are all new public APIs documented with JSDoc / rustdoc?
-3. Are types used correctly (no `any` in TS, no `.unwrap()` in Rust library code)?
-4. Are error paths handled (not swallowed silently)?
-5. Is the change minimal and focused on the task?
+- Git commit messages, code comments, and user-facing documentation are in English.
+- Comments explain why a choice exists; do not restate the code.
+- Keep changes focused and follow the existing Grafana datasource patterns.
+- Prefer named exports. Use `camelCase` for values and functions and `PascalCase` for types and components.
 
-## TypeScript Rules
+## TypeScript
 
-- **Never** use `any` — use `unknown` and type guards instead
-- **Never** use `@ts-ignore` or `@ts-expect-error` without a justification comment
-- All public functions and components **must** have explicit return types
-- Prefer `interface` over `type` for object shapes
-- Use `readonly` for properties that should not be mutated
-- React components: use `React.FC<Props>` with explicit props interface
-- Prefer named exports over default exports
-- Consistent naming: `camelCase` for variables/functions, `PascalCase` for types/components
+- Never use `any`; accept external JSON as `unknown` and validate it before use.
+- Do not use `@ts-ignore` or `@ts-expect-error` without a comment explaining the reason.
+- Give exported functions and components explicit return types and document public APIs with JSDoc.
+- Prefer interfaces for object shapes and type aliases for unions or composed types. Use `readonly` for immutable properties.
+- React components follow the existing `React.FC<Props>` style.
+- Send Tempo requests through Grafana's datasource proxy. Do not call Tempo directly from the browser.
+- The current query modes are `serviceGraph`, `traceBranches`, and `linkCostComparison`. Preserve the implementation contract in `src/types.ts` and `src/DataSource.ts`, and update the docs when it changes.
+- Handle request and parsing errors explicitly; do not silently discard failures.
 
-## Rust Rules
+## Rust and WASM
 
-- **Never** use `.unwrap()` in library code — use `Result` and `?` operator
-- Every `unsafe` block **must** have a `// SAFETY:` comment explaining why it's sound
-- Run `cargo clippy --workspace -- -D warnings` — zero warnings tolerance
-- Run `cargo fmt` before commit — formatting is non-negotiable
-- Prefer iterators and combinators over manual loops
-- All public items **must** have `///` doc comments
-- Use `pub(crate)` instead of `pub` when item doesn't need to be in the public API
+- The Cargo workspace contains `wasm-core` and `otel-mock`; plugin analysis changes usually belong in the `agent-core` crate under `wasm-core/`.
+- Do not use `.unwrap()` in library code. Prefer `Result`, `?`, and useful error context.
+- The workspace denies unsafe Rust. If unsafe code becomes necessary, include a `// SAFETY:` explanation and revisit the workspace lint policy.
+- Document public Rust items with rustdoc comments. Use `pub(crate)` when an item is not part of the crate API.
+- Run `cargo fmt -p agent-core` and `cargo clippy -p agent-core -- -D warnings` for Rust changes.
+- The TypeScript/WASM boundary uses JSON strings. Preserve initialization handling, output parsing, and the TypeScript fallback behavior when changing it.
+- After changing Rust analysis code, run `npm run build:wasm` and include the updated generated glue and `.wasm` binary.
 
-## File Organization
+## Tests and Verification
 
-- Follow the directory structure in `docs/DESIGN.md` §8
-- Types go in `src/types/`, components in `src/components/`, services in `src/services/`
-- One component per file, file name matches component name
-- Rust modules follow `module_name.rs` convention
+- Add behavior-focused tests for new functionality. Put frontend unit tests in `tests/unit/`, Playwright tests in `e2e/`, and Rust unit tests alongside their modules in `wasm-core/src/`.
+- Run the relevant test for the changed area. Before creating a commit, run `npm run verify`; it includes Rust checks and requires the Rust toolchain.
+- Keep the checked-in WASM output current. CI rebuilds it and compares it with `wasm-core/pkg/agent_core.js` and `wasm-core/pkg/agent_core_bg.wasm`.
 
-## Testing
+## Review Checklist
 
-- Every new feature **must** have at least one test
-- Test files go in `tests/unit/` (unit) or `tests/integration/` (integration)
-- Use test fixtures from `tests/fixtures/` for sample data
-- Use factory functions from `tests/fixtures/factories.ts` for programmatic data generation
-- Test names describe the expected behavior: `should_detect_anomaly_with_z_score`
-
-## Error Handling
-
-TypeScript: use try/catch with typed error responses, never swallow errors.
-Rust: propagate with `Result` and `?`, add context with `.map_err()`.
-
-## WASM Bridge Pattern
-
-TypeScript services that call Rust WASM must:
-1. Handle WASM initialization failures gracefully
-2. Serialize input to JSON string for WASM boundary
-3. Deserialize WASM output from JSON string
-4. Provide fallback behavior when WASM is unavailable
-
-## Code Review Checklist
-
-### Critical (must fix before commit)
-- No `any` types, no unhandled promise rejections, no hardcoded secrets
-- No `.unwrap()` / `.expect()` in Rust library code
-- Every `unsafe` has a `// SAFETY:` comment
-- `cargo clippy -- -D warnings` passes
-
-### High (should fix)
-- Components have error boundaries / error states
-- Async operations have loading / error / success states
-- Types match `docs/DESIGN.md` §5 data model
-- No memory leaks (useEffect cleanup, event listener removal)
-- Borrows used instead of unnecessary clones in Rust
-
-### Medium (flag to reviewer)
-- Single responsibility per function
-- Magic numbers replaced with constants from `src/utils/constants.ts`
-- Imports organized: external → internal → types
+- The change fits a frontend Tempo datasource and its DataFrame contract; it does not introduce panel UI or backend behavior into this plugin.
+- No `any`, swallowed errors, unhandled promise rejections, or hardcoded secrets.
+- Rust changes pass the configured clippy and formatting checks and do not add unsafe code.
+- Async datasource paths have clear failure behavior, and changes have focused tests where useful.
+- Documentation describes the current Tempo trace and service graph scope.
