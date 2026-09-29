@@ -15,13 +15,13 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.97.1
         with:
           targets: wasm32-unknown-unknown
           components: clippy, rustfmt
       - uses: taiki-e/install-action@v2
         with:
-          tool: wasm-pack
+          tool: wasm-pack@0.15.0
       - run: npm ci
       - run: npm run build:wasm
       - run: git diff --exit-code -- wasm-core/pkg/agent_core.js wasm-core/pkg/agent_core_bg.wasm
