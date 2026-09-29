@@ -1,6 +1,6 @@
 import path from 'node:path';
 
-import grafanaConfig from './.config/rspack/rspack.config.js';
+import grafanaConfig from './.config/rspack/rspack.config.ts';
 
 /** @type {(env?: Record<string, unknown>) => import('@rspack/core').Configuration} */
 export default function config(env = {}) {
