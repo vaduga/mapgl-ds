@@ -75,7 +75,7 @@ npm run e2e            # Playwright tests against the local Grafana stack
 
 - Add behavior-focused tests for new functionality. Put frontend unit tests in `tests/unit/`, Playwright tests in `e2e/`, and Rust unit tests alongside their modules in `wasm-core/src/`.
 - Run the relevant test for the changed area. Before creating a commit, run `npm run verify`; it includes Rust checks and requires the Rust toolchain.
-- Keep the checked-in WASM output current. CI rebuilds it and compares it with `wasm-core/pkg/agent_core.js` and `wasm-core/pkg/agent_core_bg.wasm`.
+- Keep the checked-in WASM output current. CI rebuilds it and checks that the generated glue in `wasm-core/pkg/agent_core.js` is current; include the generated `.wasm` binary whenever Rust analysis changes.
 
 ## Review Checklist
 
