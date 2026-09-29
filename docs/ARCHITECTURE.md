@@ -87,7 +87,7 @@ If WASM initialization or graph extraction fails, the datasource uses the TypeSc
 
 The local stack is trace-only:
 
-- Grafana loads the unsigned datasource plugin from `dist/vaduga-mapgl-datasource`.
+- Grafana loads the unsigned datasource plugin from `dist/`, mounted at the plugin ID path.
 - Tempo receives and serves traces.
 - `otel-mock` emits synthetic OTLP traces to Tempo.
 - Grafana state is persisted under `docker_data/grafana_data`.
@@ -96,4 +96,4 @@ The stack intentionally excludes metrics and logs services.
 
 ## Build Artifacts
 
-`npm run build` bundles the Grafana plugin with the checked-in Rust WASM module through the standard Webpack configuration, so reviewers can build without installing Rust. After changing the Rust crate, regenerate the tracked WASM glue and binary with `npm run build:wasm`. Webpack writes the plugin to `dist/vaduga-mapgl-datasource`, which is the directory mounted into Grafana by Docker Compose. Rspack remains available for the frontend development watcher.
+`npm run build` bundles the Grafana plugin with the checked-in Rust WASM module through the standard Webpack configuration, so reviewers can build without installing Rust. After changing the Rust crate, regenerate the tracked WASM glue and binary with `npm run build:wasm`. Webpack writes the plugin files to `dist/`; Docker Compose mounts that directory at the plugin ID path inside Grafana. Rspack remains available for the frontend development watcher.

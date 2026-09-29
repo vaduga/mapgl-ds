@@ -35,9 +35,9 @@
     "format:check:rust": "cargo fmt -p agent-core -- --check",
     "e2e": "playwright test",
     "server": "docker compose up --build",
-    "sign": "sign-plugin --distDir dist/vaduga-mapgl-datasource",
+    "sign": "sign-plugin --distDir dist",
     "bump": "node --experimental-strip-types scripts/bump-version.ts",
-    "package": "echo \"$(date +%H:%M:%S) [PKG] Packaging...\" && npm run build && VER=$(node -p \"JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version\") && cd dist && zip -FSqr vaduga-mapgl-datasource-$VER.zip vaduga-mapgl-datasource && echo \"$(date +%H:%M:%S) [PKG] Done: vaduga-mapgl-datasource-$VER.zip\"",
+    "package": "echo \"$(date +%H:%M:%S) [PKG] Packaging...\" && npm run build && VER=$(node -p \"JSON.parse(require('fs').readFileSync('package.json', 'utf8')).version\") && PLUGIN_ID=$(node -p \"JSON.parse(require('fs').readFileSync('src/plugin.json', 'utf8')).id\") && ROOT_DIR=$(pwd) && PACKAGE_STAGING_DIR=$(mktemp -d) && cp -R dist \"$PACKAGE_STAGING_DIR/$PLUGIN_ID\" && (cd \"$PACKAGE_STAGING_DIR\" && zip -FSqr \"$ROOT_DIR/dist/$PLUGIN_ID-$VER.zip\" \"$PLUGIN_ID\") && rm -rf \"$PACKAGE_STAGING_DIR\" && echo \"$(date +%H:%M:%S) [PKG] Done: dist/$PLUGIN_ID-$VER.zip\"",
     "dev:reload": "echo \"$(date +%H:%M:%S) [RELOAD] Building and restarting Grafana...\" && npm run build && docker compose up -d grafana --force-recreate && echo \"$(date +%H:%M:%S) [RELOAD] Done\"",
     "verify": "echo \"$(date +%H:%M:%S) [VERIFY] Starting...\" && npm run lint && npm run typecheck && npm run test && npm run build:webpack && echo \"$(date +%H:%M:%S) [VERIFY] All checks passed\""
   },

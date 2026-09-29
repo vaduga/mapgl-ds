@@ -19,7 +19,7 @@ services:
       - GF_PATHS_PLUGINS=/var/lib/grafana-plugins
     volumes:
       - $PWD/docker_data/grafana_plugins:/var/lib/grafana-plugins
-      - ./dist/vaduga-mapgl-datasource:/var/lib/grafana-plugins/vaduga-mapgl-datasource:ro
+      - ./dist:/var/lib/grafana-plugins/vaduga-mapgl-datasource:ro
 #      - ./dist_pro:/var/lib/grafana-plugins/vaduga-mapglpro-panel:ro
       - ./provisioning:/etc/grafana/provisioning
       - $PWD/docker_data/grafana_data:/var/lib/grafana

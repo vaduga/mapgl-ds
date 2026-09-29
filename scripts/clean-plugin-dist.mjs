@@ -1,7 +1,7 @@
 import { mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
-const outDir = path.resolve(import.meta.dirname, '../dist/vaduga-mapgl-datasource');
+const outDir = path.resolve(import.meta.dirname, '../dist');
 
 await mkdir(outDir, { recursive: true });
 const entries = await readdir(outDir, { withFileTypes: true });
